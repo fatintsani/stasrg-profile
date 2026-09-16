@@ -12,8 +12,22 @@ class Partner extends Model
     protected $fillable = [
         'name',
         'category',
+        'partnership_type',
+        'description',
+        'description_id',
         'logo_text',
         'logo_url',
+        'website_url',
+        'established_year',
+        'is_featured',
+        'is_active',
         'order',
+    ];
+
+    protected $casts = [
+        'is_featured' => 'boolean',
+        'is_active' => 'boolean',
+        'established_year' => 'integer',
+        'order' => 'integer',
     ];
 }

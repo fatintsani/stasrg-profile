@@ -18,12 +18,14 @@ class DatabaseSeeder extends Seeder
         $this->call(LandingPageSeeder::class);
 
         User::firstOrCreate(
-            ['email' => 'admin@stasrg.com'],
+            ['email' => 'admin@stasrg.telu.ac.id'],
             [
-                'name' => 'Administrator',
-                'password' => 'password',
-                'role' => 'admin',
-                'institution' => 'Center of Excellence STAS-RG',
+                'name' => 'Admin Researcher',
+                'username' => 'admin',
+                'password' => bcrypt('password'),
+                'role' => 'principal_researcher',
+                'institution' => 'Telkom University',
+                'email_verified_at' => now(),
             ]
         );
     }

@@ -25,12 +25,12 @@ class LandingPageController extends Controller
     {
         $metrics = ResearchMetric::orderBy('order')->get();
         $aboutHighlights = AboutHighlight::orderBy('order')->get();
-        $domains = ResearchDomain::orderBy('order')->get();
-        $projects = ResearchProject::where('featured', true)->orderBy('order')->get();
-        $publications = Publication::orderBy('order')->get();
-        $services = EnterpriseService::orderBy('order')->get();
-        $partners = Partner::orderBy('order')->get();
-        $articles = Article::orderBy('order')->get();
+        $domains = ResearchDomain::where('is_active', true)->orderBy('order')->get();
+        $projects = ResearchProject::where('is_active', true)->orderBy('order')->get();
+        $publications = Publication::where('is_active', true)->orderBy('order')->get();
+        $services = EnterpriseService::where('is_active', true)->orderBy('order')->get();
+        $partners = Partner::where('is_active', true)->orderBy('order')->get();
+        $articles = Article::where('is_active', true)->orderBy('order')->orderByDesc('id')->get();
         $events = UpcomingEvent::orderBy('order')->get();
 
         $siteConfig = [

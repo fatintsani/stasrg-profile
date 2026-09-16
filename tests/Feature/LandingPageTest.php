@@ -30,7 +30,7 @@ class LandingPageTest extends TestCase
             ->has('services', 6)
             ->has('partners', 6)
             ->has('articles', 3)
-            ->has('events', 2)
+            ->has('events', 4)
             ->has('siteConfig')
         );
     }

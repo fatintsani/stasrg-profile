@@ -151,6 +151,7 @@ export default function Home({
                 <EventsSection
                     events={events}
                     t={t.events}
+                    language={language}
                     onRegisterClick={(eventTitle) => handleOpenContactWithSubject(`Event Registration: ${eventTitle}`)}
                 />
 

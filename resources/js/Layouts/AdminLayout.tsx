@@ -1,68 +1,72 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
+import { BrandLogo } from '../Components/Common/BrandLogo';
 import { FlagIcon } from '../Components/Common/FlagIcon';
 import { Language, translations } from '../utils/translations';
 import {
     LayoutDashboard,
-    Bot,
-    FolderKanban,
-    LayoutTemplate,
-    BarChart3,
-    Image,
-    GraduationCap,
-    UserCheck,
-    HelpCircle,
-    Activity,
-    Settings,
-    ChevronDown,
-    Menu,
-    X,
+    Layers,
+    Briefcase,
+    BookOpen,
+    FlaskConical,
+    Building2,
+    Calendar,
+    Newspaper,
+    TrendingUp,
+    Users,
+    SlidersHorizontal,
+    ExternalLink,
     Search,
+    Bell,
     Sun,
     Moon,
-    Bell,
+    Menu,
+    X,
+    ChevronDown,
     LogOut,
-    ExternalLink,
-    ChevronRight,
-    Sparkles,
+    User,
     Shield,
-    Layers,
-    BookOpen,
-    Briefcase,
-    Newspaper,
-    MessageSquare,
+    CheckCircle2,
+    PanelLeftClose,
+    PanelLeft,
 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface AdminLayoutProps {
     children: React.ReactNode;
-    currentMenu?: string;
+    title?: string;
     siteConfig?: {
         center_name?: string;
+        institution?: string;
+        sub_institution?: string;
     };
 }
 
-export const AdminLayout: React.FC<AdminLayoutProps> = ({
+export default function AdminLayout({
     children,
-    currentMenu = 'dashboard',
+    title = 'Dashboard',
     siteConfig,
-}) => {
+}: AdminLayoutProps) {
+    const { url } = usePage();
+
     // 1. Language & Theme State
-    const [language, setLanguage] = useState<Language>('ID');
+    const [language, setLanguage] = useState<Language>('EN');
     const [theme, setTheme] = useState<'light' | 'dark'>('light');
 
-    // 2. Sidebar & Navigation State
-    const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+    // 2. Navigation & Drawer State
     const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
-    const [projectsDropdownOpen, setProjectsDropdownOpen] = useState(true);
+    const [desktopCollapsed, setDesktopCollapsed] = useState(false);
     const [userDropdownOpen, setUserDropdownOpen] = useState(false);
-    const [searchQuery, setSearchQuery] = useState('');
+    const [notificationsOpen, setNotificationsOpen] = useState(false);
 
     useEffect(() => {
+        // Load saved language
         const savedLang = localStorage.getItem('stas_lang') as Language;
         if (savedLang === 'EN' || savedLang === 'ID') {
             setLanguage(savedLang);
         }
 
+        // Load saved theme
         const savedTheme = localStorage.getItem('stas_theme') as 'light' | 'dark';
         if (savedTheme === 'dark') {
             setTheme('dark');
@@ -93,293 +97,345 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
         }
     };
 
-    const menuItems = [
+    const isEn = language === 'EN';
+
+    // Navigation Menu Structure tailored for CoE STAS-RG
+    const navigationGroups = [
         {
-            id: 'dashboard',
-            label: language === 'EN' ? 'Dashboard Overview' : 'Dashboard Overview',
-            href: '/admin/dashboard',
-            icon: LayoutDashboard,
+            groupName: isEn ? 'OVERVIEW' : 'RINGKASAN',
+            items: [
+                {
+                    name: isEn ? 'Dashboard' : 'Dasbor Utama',
+                    href: '/admin',
+                    icon: LayoutDashboard,
+                    active: url === '/admin' || url === '/admin/dashboard',
+                },
+            ],
         },
         {
-            id: 'nara',
-            label: 'NARA AI Assistant',
-            href: '#nara',
-            icon: Sparkles,
-            badge: 'AI',
+            groupName: isEn ? 'RESEARCH & R&D' : 'RISET & PENGEMBANGAN',
+            items: [
+                {
+                    name: isEn ? 'Research Domains' : 'Domain Riset',
+                    href: '/admin/domains',
+                    icon: Layers,
+                    active: url === '/admin/domains' || url.startsWith('/admin/domains'),
+                    badge: '8',
+                },
+                {
+                    name: isEn ? 'Featured Projects' : 'Proyek Riset Unggulan',
+                    href: '/admin/projects',
+                    icon: Briefcase,
+                    active: url === '/admin/projects' || url.startsWith('/admin/projects'),
+                },
+                {
+                    name: isEn ? 'Peer-Reviewed Repository' : 'Repositori Publikasi',
+                    href: '/admin/publications',
+                    icon: BookOpen,
+                    active: url === '/admin/publications' || url.startsWith('/admin/publications'),
+                },
+            ],
         },
         {
-            id: 'projects',
-            label: language === 'EN' ? 'Projects & Innovation' : 'Proyek Riset & Flyer',
-            href: '/admin/projects',
-            icon: FolderKanban,
-            hasSubmenu: true,
+            groupName: isEn ? 'ENGAGEMENT & INDUSTRIAL' : 'KOLABORASI & INDUSTRI',
+            items: [
+                {
+                    name: isEn ? 'Enterprise Services' : 'Layanan Industri',
+                    href: '/admin/services',
+                    icon: FlaskConical,
+                    active: url === '/admin/services' || url.startsWith('/admin/services'),
+                },
+                {
+                    name: isEn ? 'Strategic Partners' : 'Mitra Kerjasama',
+                    href: '/admin/partners',
+                    icon: Building2,
+                    active: url === '/admin/partners' || url.startsWith('/admin/partners'),
+                },
+                {
+                    name: isEn ? 'Symposia & Events' : 'Simposium & Agenda',
+                    href: '/admin/events',
+                    icon: Calendar,
+                    active: url === '/admin/events' || url.startsWith('/admin/events'),
+                },
+                {
+                    name: isEn ? 'News & Insights' : 'Berita & Wawasan',
+                    href: '/admin/articles',
+                    icon: Newspaper,
+                    active: url === '/admin/articles' || url.startsWith('/admin/articles'),
+                },
+            ],
         },
         {
-            id: 'domains',
-            label: language === 'EN' ? 'Research Domains' : 'Klaster & Fokus Riset',
-            href: '/admin/domains',
-            icon: Layers,
-        },
-        {
-            id: 'publications',
-            label: language === 'EN' ? 'Publications & Papers' : 'Publikasi Ilmiah',
-            href: '/admin/publications',
-            icon: BookOpen,
-        },
-        {
-            id: 'researchers',
-            label: language === 'EN' ? 'Researchers & Team' : 'Tim & Direktori Peneliti',
-            href: '/admin/researchers',
-            icon: GraduationCap,
-        },
-        {
-            id: 'services',
-            label: language === 'EN' ? 'Services & Partners' : 'Layanan & Kemitraan',
-            href: '/admin/services',
-            icon: Briefcase,
-        },
-        {
-            id: 'news',
-            label: language === 'EN' ? 'News & Symposia' : 'Berita & Agenda Event',
-            href: '/admin/news-events',
-            icon: Newspaper,
-        },
-        {
-            id: 'assets',
-            label: language === 'EN' ? 'Templates & Media Hub' : 'Template Hub & Media',
-            href: '/admin/assets',
-            icon: LayoutTemplate,
-        },
-        {
-            id: 'messages',
-            label: language === 'EN' ? 'Inquiries & Collab' : 'Pesan & Kolaborasi',
-            href: '/admin/messages',
-            icon: MessageSquare,
-        },
-        {
-            id: 'settings',
-            label: language === 'EN' ? 'System Settings' : 'Pengaturan Sistem',
-            href: '/admin/settings',
-            icon: Settings,
+            groupName: isEn ? 'MANAGEMENT' : 'PENGATURAN',
+            items: [
+                {
+                    name: isEn ? 'Impact Metrics' : 'Metrik Kinerja',
+                    href: '/admin#metrics',
+                    icon: TrendingUp,
+                    active: url.includes('/admin/metrics'),
+                },
+                {
+                    name: isEn ? 'Researchers & Team' : 'Tim Peneliti',
+                    href: '/admin#team',
+                    icon: Users,
+                    active: url.includes('/admin/team'),
+                },
+                {
+                    name: isEn ? 'Portal Settings' : 'Pengaturan Situs',
+                    href: '/admin#settings',
+                    icon: SlidersHorizontal,
+                    active: url.includes('/admin/settings'),
+                },
+            ],
         },
     ];
 
     return (
-        <div className="h-screen w-screen overflow-hidden bg-[#F8FAFB] dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors duration-200 flex">
-            {/* 1. Desktop & Mobile Sidebar */}
-            <aside
-                className={`fixed inset-y-0 left-0 z-40 flex flex-col justify-between bg-white dark:bg-slate-900 border-r border-slate-200/90 dark:border-slate-800 transition-all duration-300 lg:static lg:h-full lg:min-h-0 shrink-0 ${
-                    sidebarCollapsed ? 'w-20' : 'w-64'
-                } ${
-                    mobileSidebarOpen
-                        ? 'translate-x-0 shadow-2xl'
-                        : '-translate-x-full lg:translate-x-0'
-                }`}
-            >
-                {/* Top Section: Brand Header & Scrollable Nav */}
-                <div className="flex flex-col flex-1 min-h-0 overflow-hidden">
-                    {/* Sidebar Brand Header */}
-                    <div className="h-16 px-5 border-b border-slate-100 dark:border-slate-800/80 flex items-center justify-between shrink-0">
-                        <Link href="/admin/dashboard" className="flex items-center gap-2.5 overflow-hidden">
-                            <div className="w-8 h-8 rounded-lg bg-[#EDFBF1] dark:bg-[#10381C] flex items-center justify-center shrink-0 border border-[#B2EFC3]/60 dark:border-[#1A5C2F]">
-                                <img
-                                    src="/assets/images/telu_noname.png"
-                                    alt="STAS Logo"
-                                    className="w-5 h-5 object-contain"
-                                    onError={(e) => {
-                                        (e.target as HTMLImageElement).src = '/stas.png';
-                                    }}
-                                />
-                            </div>
-                            {!sidebarCollapsed && (
-                                <div className="leading-tight">
-                                    <div className="text-sm font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-1">
-                                        <span>STAS RG</span>
-                                        <span className="text-[#107E27] dark:text-[#1AC13B]">Projects</span>
-                                    </div>
-                                </div>
-                            )}
-                        </Link>
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans flex flex-col transition-colors duration-200">
+            <Head>
+                <title>{`${title} - Admin Management Portal | ${siteConfig?.center_name || 'CoE STAS-RG'}`}</title>
+            </Head>
 
-                        {/* Mobile Close Button */}
+            <div className="flex flex-1 overflow-hidden">
+                {/* 1. Desktop Sidebar */}
+                <aside
+                    className={`hidden lg:flex flex-col bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 transition-all duration-300 z-30 ${
+                        desktopCollapsed ? 'w-20' : 'w-64 xl:w-72'
+                    }`}
+                >
+                    {/* Sidebar Brand Header */}
+                    <div className="h-16 px-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+                        {!desktopCollapsed ? (
+                            <Link href="/admin" className="flex items-center">
+                                <BrandLogo size="sm" variant={theme === 'dark' ? 'light' : 'dark'} />
+                            </Link>
+                        ) : (
+                            <Link href="/admin" className="mx-auto flex items-center justify-center">
+                                <div className="w-8 h-8 rounded-lg bg-[#EDFBF1] dark:bg-[#10381C] flex items-center justify-center text-[#107E27] dark:text-[#3FD27B] font-black text-xs">
+                                    STAS
+                                </div>
+                            </Link>
+                        )}
                         <button
-                            onClick={() => setMobileSidebarOpen(false)}
-                            className="lg:hidden p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                            onClick={() => setDesktopCollapsed(!desktopCollapsed)}
+                            className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                            title={desktopCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
                         >
-                            <X className="w-5 h-5" />
+                            {desktopCollapsed ? (
+                                <PanelLeft className="w-4 h-4" />
+                            ) : (
+                                <PanelLeftClose className="w-4 h-4" />
+                            )}
                         </button>
                     </div>
 
-                    {/* Navigation Menu List */}
-                    <nav className="p-2.5 space-y-0.5 overflow-y-auto flex-1 min-h-0 custom-scrollbar">
-                        {menuItems.map((item) => {
-                            const Icon = item.icon;
-                            const isActive = currentMenu === item.id;
-
-                            return (
-                                <div key={item.id}>
-                                    <Link
-                                        href={item.href}
-                                        onClick={() => {
-                                            if (item.hasSubmenu) {
-                                                setProjectsDropdownOpen(!projectsDropdownOpen);
-                                            }
-                                            setMobileSidebarOpen(false);
-                                        }}
-                                        className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-[11.5px] font-bold transition-all group ${
-                                            isActive
-                                                ? 'bg-[#EDFBF1] dark:bg-[#10381C] text-[#107E27] dark:text-[#3FD27B] border border-[#B2EFC3]/60 dark:border-[#1A5C2F]'
-                                                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/70 dark:hover:bg-slate-800/60 border border-transparent'
-                                        }`}
-                                        title={sidebarCollapsed ? item.label : undefined}
-                                    >
-                                        <div className="flex items-center gap-2.5">
+                    {/* Navigation Menu Links */}
+                    <div className="flex-1 overflow-y-auto px-3 py-4 space-y-6">
+                        {navigationGroups.map((group) => (
+                            <div key={group.groupName} className="space-y-1">
+                                {!desktopCollapsed && (
+                                    <div className="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">
+                                        {group.groupName}
+                                    </div>
+                                )}
+                                {group.items.map((item) => {
+                                    const Icon = item.icon;
+                                    return (
+                                        <Link
+                                            key={item.name}
+                                            href={item.href}
+                                            className={`flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-150 group ${
+                                                item.active
+                                                    ? 'bg-[#EDFBF1] text-[#107E27] dark:bg-[#10381C] dark:text-[#3FD27B] border-l-2 border-[#1AC13B]'
+                                                    : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/70 hover:text-slate-900 dark:hover:text-white'
+                                            } ${desktopCollapsed ? 'justify-center px-2' : ''}`}
+                                            title={desktopCollapsed ? item.name : undefined}
+                                        >
                                             <Icon
-                                                className={`w-4 h-4 shrink-0 transition-transform group-hover:scale-110 ${
-                                                    isActive
-                                                        ? 'text-[#107E27] dark:text-[#3FD27B]'
+                                                className={`w-4 h-4 shrink-0 transition-colors ${
+                                                    item.active
+                                                        ? 'text-[#107E27] dark:text-[#1AC13B]'
                                                         : 'text-slate-400 dark:text-slate-500 group-hover:text-slate-700 dark:group-hover:text-slate-300'
                                                 }`}
                                             />
-                                            {!sidebarCollapsed && <span>{item.label}</span>}
-                                        </div>
-
-                                        {!sidebarCollapsed && item.badge && (
-                                            <span className="px-1.5 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider bg-[#1AC13B] text-white">
-                                                {item.badge}
-                                            </span>
-                                        )}
-
-                                        {!sidebarCollapsed && item.hasSubmenu && (
-                                            <ChevronDown
-                                                className={`w-3.5 h-3.5 text-slate-400 transition-transform ${
-                                                    projectsDropdownOpen ? 'rotate-180' : ''
-                                                }`}
-                                            />
-                                        )}
-                                    </Link>
-                                </div>
-                            );
-                        })}
-                    </nav>
-                </div>
-
-                {/* Bottom Sidebar Widgets & User Profile (Permanently Pinned at Bottom) */}
-                <div className="p-3 border-t border-slate-100 dark:border-slate-800 space-y-2 shrink-0 bg-white dark:bg-slate-900">
-                    {/* Developer Support Card */}
-                    {!sidebarCollapsed && (
-                        <div className="p-2.5 rounded-xl bg-[#EDFBF1]/80 dark:bg-[#10381C]/50 border border-[#B2EFC3]/60 dark:border-[#1A5C2F] flex items-center justify-between">
-                            <div className="flex items-center gap-2.5">
-                                <div className="w-8 h-8 rounded-full bg-[#1AC13B] text-white flex items-center justify-center font-bold text-xs shrink-0 ring-2 ring-white dark:ring-slate-900">
-                                    DS
-                                </div>
-                                <div className="leading-tight">
-                                    <div className="text-[11px] font-bold text-slate-900 dark:text-white">
-                                        Developer Support
-                                    </div>
-                                    <div className="text-[10px] font-mono text-[#107E27] dark:text-[#3FD27B]">
-                                        0831-3297-9214
-                                    </div>
-                                </div>
+                                            {!desktopCollapsed && (
+                                                <div className="flex-1 flex items-center justify-between">
+                                                    <span>{item.name}</span>
+                                                    {item.badge && (
+                                                        <span className="px-1.5 py-0.5 rounded-md text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
+                                                            {item.badge}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </Link>
+                                    );
+                                })}
                             </div>
-                            <a
-                                href="https://wa.me/6283132979214"
+                        ))}
+
+                        {/* Live Site Link in Sidebar */}
+                        <div className="pt-2 border-t border-slate-100 dark:border-slate-800/80">
+                            <Link
+                                href="/"
                                 target="_blank"
-                                rel="noopener noreferrer"
-                                className="p-1 text-[#107E27] dark:text-[#3FD27B] hover:scale-110 transition-transform"
-                                title="Contact Developer Support"
+                                className={`flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold text-slate-500 dark:text-slate-400 hover:bg-[#EDFBF1]/60 dark:hover:bg-[#10381C]/40 hover:text-[#107E27] dark:hover:text-[#1AC13B] transition-colors group ${
+                                    desktopCollapsed ? 'justify-center px-2' : ''
+                                }`}
+                                title={isEn ? 'View Live Landing Page' : 'Lihat Halaman Utama'}
                             >
-                                <ExternalLink className="w-3.5 h-3.5" />
-                            </a>
+                                <ExternalLink className="w-4 h-4 shrink-0 text-[#1AC13B]" />
+                                {!desktopCollapsed && (
+                                    <span>{isEn ? 'View Live Website' : 'Kunjungi Beranda'}</span>
+                                )}
+                            </Link>
                         </div>
-                    )}
+                    </div>
 
-                    {/* Administrator Profile Card */}
-                    <div className="p-2 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200/80 dark:border-slate-700/80 flex items-center justify-between">
-                        <div className="flex items-center gap-2.5 overflow-hidden">
-                            <div className="w-8 h-8 rounded-full bg-slate-900 dark:bg-white text-white dark:text-slate-950 flex items-center justify-center font-extrabold text-xs shrink-0">
-                                A
+                    {/* Sidebar Bottom User Profile Card */}
+                    <div className="p-3 border-t border-slate-200 dark:border-slate-800">
+                        <div
+                            className={`flex items-center gap-3 p-2 rounded-xl bg-slate-50 dark:bg-slate-800/60 ${
+                                desktopCollapsed ? 'justify-center p-1.5' : ''
+                            }`}
+                        >
+                            <div className="w-8 h-8 rounded-lg bg-[#1AC13B] text-white font-bold flex items-center justify-center text-xs shrink-0">
+                                AD
                             </div>
-                            {!sidebarCollapsed && (
-                                <div className="leading-tight truncate">
+                            {!desktopCollapsed && (
+                                <div className="flex-1 min-w-0 leading-tight">
                                     <div className="text-xs font-bold text-slate-900 dark:text-white truncate">
-                                        Administrator
+                                        Admin Researcher
                                     </div>
-                                    <div className="text-[10px] text-slate-400 dark:text-slate-500 truncate">
-                                        admin@stasrg.com
+                                    <div className="text-[10px] text-slate-400 truncate">
+                                        admin@stasrg.telu.ac.id
                                     </div>
                                 </div>
                             )}
                         </div>
-
-                        <Link
-                            href="/"
-                            className="p-1.5 text-slate-400 hover:text-rose-500 dark:hover:text-rose-400 transition-colors"
-                            title="Exit to Landing Page"
-                        >
-                            <LogOut className="w-4 h-4" />
-                        </Link>
                     </div>
-                </div>
-            </aside>
+                </aside>
 
-            {/* 2. Main Viewport & Header Bar */}
-            <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
-                    
-                    {/* Top Header Bar */}
-                    <header className="h-16 px-4 sm:px-8 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800 sticky top-0 z-30 flex items-center justify-between gap-4">
-                        
-                        {/* Left: Sidebar Toggle & Search Bar */}
-                        <div className="flex items-center gap-3 sm:gap-4 flex-1 max-w-xl">
-                            {/* Mobile Sidebar Trigger */}
+                {/* 2. Mobile Drawer Sidebar */}
+                <AnimatePresence>
+                    {mobileSidebarOpen && (
+                        <>
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                onClick={() => setMobileSidebarOpen(false)}
+                                className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-40 lg:hidden"
+                            />
+                            <motion.aside
+                                initial={{ x: '-100%' }}
+                                animate={{ x: 0 }}
+                                exit={{ x: '-100%' }}
+                                transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+                                className="fixed inset-y-0 left-0 w-72 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col z-50 lg:hidden"
+                            >
+                                <div className="h-16 px-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+                                    <BrandLogo size="sm" variant={theme === 'dark' ? 'light' : 'dark'} />
+                                    <button
+                                        onClick={() => setMobileSidebarOpen(false)}
+                                        className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-white"
+                                    >
+                                        <X className="w-5 h-5" />
+                                    </button>
+                                </div>
+
+                                <div className="flex-1 overflow-y-auto px-4 py-4 space-y-5">
+                                    {navigationGroups.map((group) => (
+                                        <div key={group.groupName} className="space-y-1">
+                                            <div className="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-1.5">
+                                                {group.groupName}
+                                            </div>
+                                            {group.items.map((item) => {
+                                                const Icon = item.icon;
+                                                return (
+                                                    <Link
+                                                        key={item.name}
+                                                        href={item.href}
+                                                        onClick={() => setMobileSidebarOpen(false)}
+                                                        className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-colors ${
+                                                            item.active
+                                                                ? 'bg-[#EDFBF1] text-[#107E27] dark:bg-[#10381C] dark:text-[#3FD27B]'
+                                                                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                                                        }`}
+                                                    >
+                                                        <Icon className="w-4 h-4 shrink-0 text-[#1AC13B]" />
+                                                        <span>{item.name}</span>
+                                                    </Link>
+                                                );
+                                            })}
+                                        </div>
+                                    ))}
+                                    <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
+                                        <Link
+                                            href="/"
+                                            className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-[#107E27]"
+                                        >
+                                            <ExternalLink className="w-4 h-4 text-[#1AC13B]" />
+                                            <span>{isEn ? 'View Live Website' : 'Kunjungi Beranda'}</span>
+                                        </Link>
+                                    </div>
+                                </div>
+                            </motion.aside>
+                        </>
+                    )}
+                </AnimatePresence>
+
+                {/* 3. Main Content Wrapper */}
+                <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+                    {/* Header / Top Navigation Bar */}
+                    <header className="h-16 px-4 sm:px-6 lg:px-8 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between z-20">
+                        <div className="flex items-center gap-3">
+                            {/* Mobile Hamburger Toggle */}
                             <button
                                 onClick={() => setMobileSidebarOpen(true)}
-                                className="lg:hidden p-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
+                                className="lg:hidden p-2 rounded-lg text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
                                 aria-label="Open sidebar"
                             >
                                 <Menu className="w-5 h-5" />
                             </button>
 
-                            {/* Desktop Collapse Toggle */}
-                            <button
-                                onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-                                className="hidden lg:flex p-2 rounded-lg text-slate-500 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
-                                aria-label="Toggle sidebar collapse"
-                            >
-                                <Menu className="w-4 h-4" />
-                            </button>
-
-                            {/* Global Search Input */}
-                            <div className="relative w-full max-w-md">
-                                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                                    <Search className="w-3.5 h-3.5" />
-                                </div>
-                                <input
-                                    type="text"
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                    placeholder={
-                                        language === 'EN'
-                                            ? 'Search project, deliverable, or document template...'
-                                            : 'Cari proyek, deliverable, atau template dokumen...'
-                                    }
-                                    className="w-full pl-9 pr-14 py-2 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#1AC13B] focus:ring-1 focus:ring-[#1AC13B] transition-all"
-                                />
-                                <div className="absolute inset-y-0 right-0 pr-2.5 flex items-center pointer-events-none">
-                                    <kbd className="px-1.5 py-0.5 rounded bg-slate-200/80 dark:bg-slate-700 text-[10px] font-mono font-bold text-slate-500 dark:text-slate-400 border border-slate-300/80 dark:border-slate-600">
-                                        ⌘K
-                                    </kbd>
-                                </div>
+                            {/* Page Header Title */}
+                            <div className="hidden sm:block">
+                                <h1 className="text-base font-extrabold text-slate-900 dark:text-white tracking-tight">
+                                    {title}
+                                </h1>
                             </div>
                         </div>
 
-                        {/* Right: Tools & Admin Profile Menu */}
-                        <div className="flex items-center gap-2 sm:gap-3">
+                        {/* Search Input on Desktop */}
+                        <div className="hidden md:flex items-center flex-1 max-w-xs lg:max-w-md mx-4">
+                            <div className="relative w-full">
+                                <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                                <input
+                                    type="text"
+                                    placeholder={isEn ? 'Search research projects, publications, records...' : 'Cari proyek riset, publikasi ilmiah, data...'}
+                                    className="w-full pl-9 pr-4 py-1.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-[#1AC13B] focus:ring-1 focus:ring-[#1AC13B] transition-all"
+                                />
+                            </div>
+                        </div>
+
+                        {/* Header Right Action Items */}
+                        <div className="flex items-center gap-1 sm:gap-2.5">
+                            {/* Live Website Shortcut */}
+                            <Link
+                                href="/"
+                                target="_blank"
+                                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:text-[#107E27] dark:hover:text-[#1AC13B] hover:border-[#1AC13B]/50 transition-colors"
+                            >
+                                <ExternalLink className="w-3.5 h-3.5 text-[#1AC13B]" />
+                                <span>{isEn ? 'Live Site' : 'Website'}</span>
+                            </Link>
+
                             {/* Language Switcher */}
                             <button
                                 onClick={handleToggleLanguage}
                                 aria-label="Toggle language"
-                                title="Toggle Language (ID / EN)"
+                                title={isEn ? 'Switch to Indonesian' : 'Ganti ke Bahasa Inggris'}
                                 className="p-2 hover:scale-110 active:scale-95 transition-transform cursor-pointer bg-transparent border-0 inline-flex items-center justify-center rounded-full"
                             >
                                 <FlagIcon language={language} size="md" />
@@ -389,7 +445,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
                             <button
                                 onClick={handleToggleTheme}
                                 aria-label="Toggle dark/light theme"
-                                title="Toggle Theme"
+                                title={isEn ? 'Toggle color scheme' : 'Ganti mode gelap/terang'}
                                 className="p-2 text-slate-500 dark:text-slate-400 hover:text-[#107E27] dark:hover:text-[#1AC13B] transition-colors cursor-pointer bg-transparent border-0"
                             >
                                 {theme === 'dark' ? (
@@ -399,55 +455,102 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
                                 )}
                             </button>
 
-                            {/* Notification Bell */}
-                            <button
-                                type="button"
-                                className="relative p-2 text-slate-500 dark:text-slate-400 hover:text-[#107E27] dark:hover:text-[#1AC13B] transition-colors cursor-pointer bg-transparent border-0"
-                                title="Notifications"
-                            >
-                                <Bell className="w-4 h-4" />
-                                <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#1AC13B]" />
-                            </button>
+                            {/* Notifications Dropdown Trigger */}
+                            <div className="relative">
+                                <button
+                                    onClick={() => setNotificationsOpen(!notificationsOpen)}
+                                    onBlur={() => setTimeout(() => setNotificationsOpen(false), 200)}
+                                    className="p-2 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors relative cursor-pointer"
+                                    aria-label="Notifications"
+                                >
+                                    <Bell className="w-4 h-4" />
+                                    <span className="w-2 h-2 rounded-full bg-[#1AC13B] absolute top-1.5 right-1.5" />
+                                </button>
 
-                            <div className="h-4 w-px bg-slate-200 dark:bg-slate-800 mx-1 hidden sm:block" />
+                                {notificationsOpen && (
+                                    <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-3 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+                                        <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
+                                            <span className="text-xs font-bold text-slate-900 dark:text-white">
+                                                {isEn ? 'Notifications' : 'Pemberitahuan'}
+                                            </span>
+                                            <span className="text-[10px] font-semibold text-[#107E27] dark:text-[#1AC13B]">
+                                                2 New
+                                            </span>
+                                        </div>
+                                        <div className="py-2 space-y-2 text-xs">
+                                            <div className="p-2 rounded-lg bg-slate-50 dark:bg-slate-800/60">
+                                                <div className="font-bold text-slate-800 dark:text-slate-200">
+                                                    IS-STSS 2026 Registration
+                                                </div>
+                                                <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                                                    New participant registered from Indonesia Power.
+                                                </div>
+                                            </div>
+                                            <div className="p-2 rounded-lg bg-slate-50 dark:bg-slate-800/60">
+                                                <div className="font-bold text-slate-800 dark:text-slate-200">
+                                                    Q1 Paper Published
+                                                </div>
+                                                <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                                                    IEEE Transactions citation updated.
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
 
-                            {/* Admin Profile Dropdown Button */}
+                            <div className="h-5 w-px bg-slate-200 dark:bg-slate-800 mx-1" />
+
+                            {/* User Profile Dropdown */}
                             <div className="relative">
                                 <button
                                     onClick={() => setUserDropdownOpen(!userDropdownOpen)}
                                     onBlur={() => setTimeout(() => setUserDropdownOpen(false), 200)}
-                                    className="flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 transition-all cursor-pointer"
+                                    className="flex items-center gap-2 p-1 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
                                 >
-                                    <div className="w-6 h-6 rounded-full bg-[#1AC13B] text-white flex items-center justify-center font-bold text-xs">
-                                        A
+                                    <div className="w-8 h-8 rounded-lg bg-[#1AC13B] text-white font-bold flex items-center justify-center text-xs shrink-0">
+                                        AD
                                     </div>
-                                    <span className="text-xs font-bold text-slate-800 dark:text-slate-200 hidden sm:inline">
-                                        Administrator
-                                    </span>
-                                    <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+                                    <ChevronDown className="w-3.5 h-3.5 text-slate-400 hidden sm:block" />
                                 </button>
 
                                 {userDropdownOpen && (
-                                    <div className="absolute right-0 mt-2 w-48 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-1.5 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+                                    <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
                                         <div className="px-3 py-2 border-b border-slate-100 dark:border-slate-800 mb-1">
                                             <div className="text-xs font-bold text-slate-900 dark:text-white">
-                                                Administrator
+                                                Principal Lead
                                             </div>
-                                            <div className="text-[10px] text-slate-400">admin@stasrg.com</div>
+                                            <div className="text-[10px] text-slate-400 truncate">
+                                                admin@stasrg.telu.ac.id
+                                            </div>
                                         </div>
+
                                         <Link
-                                            href="/"
-                                            className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-[#EDFBF1] dark:hover:bg-slate-800 hover:text-[#107E27] dark:hover:text-[#1AC13B] transition-colors"
+                                            href="/admin"
+                                            className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                                         >
-                                            <ExternalLink className="w-3.5 h-3.5" />
-                                            <span>Lihat Landing Page</span>
+                                            <User className="w-3.5 h-3.5 text-slate-400" />
+                                            <span>{isEn ? 'Researcher Profile' : 'Profil Peneliti'}</span>
                                         </Link>
+
                                         <Link
-                                            href="/login"
-                                            className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors"
+                                            href="/admin#settings"
+                                            className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                                        >
+                                            <Shield className="w-3.5 h-3.5 text-slate-400" />
+                                            <span>{isEn ? 'Access & Security' : 'Keamanan & Hak Akses'}</span>
+                                        </Link>
+
+                                        <div className="my-1 border-t border-slate-100 dark:border-slate-800" />
+
+                                        <Link
+                                            href="/logout"
+                                            method="post"
+                                            as="button"
+                                            className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors font-semibold text-left cursor-pointer"
                                         >
                                             <LogOut className="w-3.5 h-3.5" />
-                                            <span>Keluar</span>
+                                            <span>{isEn ? 'Sign Out' : 'Keluar'}</span>
                                         </Link>
                                     </div>
                                 )}
@@ -455,18 +558,29 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
                         </div>
                     </header>
 
-                    {/* Content Scroll Viewport */}
-                    <div className="flex-1 overflow-y-auto min-h-0 flex flex-col justify-between">
-                        <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto space-y-6">
+                    {/* Main Scrollable Content */}
+                    <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+                        <div className="max-w-7xl mx-auto space-y-6">
                             {children}
-                        </main>
+                        </div>
+                    </main>
 
-                        {/* Admin Footer */}
-                        <footer className="w-full shrink-0 py-4 px-6 border-t border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900 text-center text-xs text-slate-400 dark:text-slate-500">
-                            <p>© {new Date().getFullYear()} CoE STAS-RG | Telkom University. All rights reserved.</p>
-                        </footer>
-                    </div>
+                    {/* Admin Footer */}
+                    <footer className="h-12 px-6 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs text-slate-400 dark:text-slate-500">
+                        <div className="flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-[#1AC13B] inline-block" />
+                            <span className="font-semibold text-slate-600 dark:text-slate-400">
+                                {isEn ? 'CoE STAS-RG Management System' : 'Sistem Pengelolaan CoE STAS-RG'}
+                            </span>
+                            <span className="hidden sm:inline">•</span>
+                            <span className="hidden sm:inline font-mono text-[11px]">v2.0 Modern Minimalist</span>
+                        </div>
+                        <div>
+                            <span>© {new Date().getFullYear()} Telkom University</span>
+                        </div>
+                    </footer>
                 </div>
+            </div>
         </div>
     );
-};
+}

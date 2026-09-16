@@ -6,6 +6,7 @@ interface CardProps {
     hoverable?: boolean;
     borderAccent?: boolean;
     padding?: 'none' | 'sm' | 'md' | 'lg';
+    onClick?: () => void;
 }
 
 export const Card: React.FC<CardProps> = ({
@@ -14,6 +15,7 @@ export const Card: React.FC<CardProps> = ({
     hoverable = true,
     borderAccent = false,
     padding = 'md',
+    onClick,
 }) => {
     const paddings = {
         none: 'p-0',

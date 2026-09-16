@@ -153,6 +153,8 @@ export interface TranslationDictionary {
         tabLogin: string;
         tabRegister: string;
         fullNameLabel: string;
+        usernameLabel: string;
+        usernamePlaceholder: string;
         institutionLabel: string;
         roleLabel: string;
         confirmPassLabel: string;
@@ -366,6 +368,8 @@ export const translations: Record<Language, TranslationDictionary> = {
             tabLogin: 'Sign In',
             tabRegister: 'Create Account',
             fullNameLabel: 'Full Name with Academic Title',
+            usernameLabel: 'Username / Account ID',
+            usernamePlaceholder: 'e.g. alex_researcher',
             institutionLabel: 'Institution / Department / Organization',
             roleLabel: 'Researcher Category',
             confirmPassLabel: 'Confirm Password',
@@ -574,9 +578,11 @@ export const translations: Record<Language, TranslationDictionary> = {
             orContinueWith: 'Atau lanjutkan dengan',
             noAccount: 'Belum memiliki akun?',
             requestAccess: 'Daftar Akun Baru',
-            tabLogin: 'Masuk Akun',
+            tabLogin: 'Masuk',
             tabRegister: 'Daftar Akun',
             fullNameLabel: 'Nama Lengkap Beserta Gelar',
+            usernameLabel: 'Username / ID Pengguna',
+            usernamePlaceholder: 'contoh: alex_researcher',
             institutionLabel: 'Institusi / Departemen / Organisasi',
             roleLabel: 'Kategori Peneliti',
             confirmPassLabel: 'Konfirmasi Kata Sandi',

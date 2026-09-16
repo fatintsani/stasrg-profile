@@ -1,797 +1,639 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Head, Link } from '@inertiajs/react';
-import { AdminLayout } from '../../Layouts/AdminLayout';
-import { motion } from 'framer-motion';
+import AdminLayout from '../../Layouts/AdminLayout';
+import { Language } from '../../utils/translations';
 import {
-    Plus,
-    Eye,
-    Edit3,
-    FileText,
-    TrendingUp,
-    Globe,
-    FileEdit,
-    Tag,
-    BookOpen,
-    Briefcase,
-    Search,
-    ChevronDown,
-    ArrowUpRight,
-    FolderKanban,
+    LayoutDashboard,
     Layers,
-    Fingerprint,
+    Briefcase,
+    BookOpen,
+    FlaskConical,
+    Building2,
+    Calendar,
+    Newspaper,
+    TrendingUp,
+    Users,
+    SlidersHorizontal,
     ExternalLink,
+    Plus,
+    ArrowUpRight,
+    Search,
     CheckCircle2,
+    Clock,
+    Tag,
+    ChevronRight,
+    FileText,
     Sparkles,
     ShieldCheck,
-    Download,
-    Printer,
+    BarChart3,
+    Activity,
 } from 'lucide-react';
+import { motion } from 'framer-motion';
 
-interface FlyerProject {
+interface ResearchProject {
     id: number;
-    title: string;
-    headline: string;
     category: string;
-    partner: string;
-    status: 'Published' | 'Draft';
-    updated_at: string;
-    thumbnail_url: string;
-    has_qr?: boolean;
+    category_tag?: string;
+    title: string;
+    slug: string;
+    image_url?: string;
+    lead_researcher?: string;
+    summary?: string;
+    featured: boolean;
+    order: number;
+    created_at?: string;
 }
 
-interface ClusterDistribution {
-    name: string;
-    count: number;
-    percentage: number;
+interface Publication {
+    id: number;
+    badge: string;
+    badge_type: string;
+    year: number;
+    venue: string;
+    doi?: string;
+    title: string;
+    authors: string;
+    pdf_url?: string;
+    doi_url?: string;
+    order: number;
+}
+
+interface Article {
+    id: number;
+    tag: string;
+    date: string;
+    title: string;
+    slug: string;
+    summary: string;
+    read_time?: string;
+    order: number;
+}
+
+interface UpcomingEvent {
+    id: number;
+    tag: string;
+    date_display: string;
+    title: string;
+    description: string;
+    location?: string;
+    primary_action_text?: string;
+    secondary_action_text?: string;
+    order: number;
+}
+
+interface ResearchDomain {
+    id: number;
+    domain_number: string;
+    title: string;
+    slug: string;
+    icon?: string;
+    summary?: string;
+    link?: string;
+    order: number;
 }
 
 interface DashboardProps {
     stats: {
-        total_riset: number;
-        di_landing: number;
-        draft_internal: number;
-        klaster_riset: number;
-        publikasi_ilmiah: number;
-        mitra_kustom: number;
+        projects_count: number;
+        publications_count: number;
+        partners_count: number;
+        articles_count: number;
+        events_count: number;
+        domains_count: number;
+        services_count: number;
     };
-    flyerProjects: FlyerProject[];
-    clusters: ClusterDistribution[];
-    user: {
-        name: string;
-        email: string;
-        role: string;
-        avatar: string | null;
-    };
-    siteConfig?: {
+    recentProjects: ResearchProject[];
+    recentPublications: Publication[];
+    recentArticles: Article[];
+    upcomingEvents: UpcomingEvent[];
+    domains: ResearchDomain[];
+    siteConfig: {
         center_name?: string;
+        institution?: string;
+        sub_institution?: string;
     };
 }
 
 export default function Dashboard({
     stats,
-    flyerProjects = [],
-    clusters = [],
-    user,
+    recentProjects = [],
+    recentPublications = [],
+    recentArticles = [],
+    upcomingEvents = [],
+    domains = [],
     siteConfig,
 }: DashboardProps) {
-    const [selectedTab, setSelectedTab] = useState<'all' | 'published' | 'draft'>('all');
-    const [categoryFilter, setCategoryFilter] = useState<string>('all');
-    const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc');
-    const [searchQuery, setSearchQuery] = useState('');
-    const [categoryDropdownOpen, setCategoryDropdownOpen] = useState(false);
-    const [sortDropdownOpen, setSortDropdownOpen] = useState(false);
-    const [previewProject, setPreviewProject] = useState<FlyerProject | null>(null);
+    const [language, setLanguage] = useState<Language>('EN');
 
-    // Filter and sort flyer projects
-    const filteredProjects = useMemo(() => {
-        return flyerProjects
-            .filter((p) => {
-                if (selectedTab === 'published' && p.status !== 'Published') return false;
-                if (selectedTab === 'draft' && p.status !== 'Draft') return false;
-                if (categoryFilter !== 'all' && p.category !== categoryFilter) return false;
-                if (searchQuery.trim() !== '') {
-                    const query = searchQuery.toLowerCase();
-                    const matchTitle = p.title.toLowerCase().includes(query);
-                    const matchHeadline = p.headline.toLowerCase().includes(query);
-                    const matchCategory = p.category.toLowerCase().includes(query);
-                    const matchPartner = p.partner.toLowerCase().includes(query);
-                    if (!matchTitle && !matchHeadline && !matchCategory && !matchPartner) return false;
-                }
-                return true;
-            })
-            .sort((a, b) => {
-                if (sortOrder === 'asc') {
-                    return a.id - b.id;
-                }
-                return b.id - a.id;
-            });
-    }, [flyerProjects, selectedTab, categoryFilter, sortOrder, searchQuery]);
+    useEffect(() => {
+        const savedLang = localStorage.getItem('stas_lang') as Language;
+        if (savedLang === 'EN' || savedLang === 'ID') {
+            setLanguage(savedLang);
+        }
 
-    // Unique categories for filter dropdown
-    const availableCategories = useMemo(() => {
-        const set = new Set<string>();
-        flyerProjects.forEach((p) => set.add(p.category));
-        return Array.from(set);
-    }, [flyerProjects]);
+        const handleStorageChange = () => {
+            const updatedLang = localStorage.getItem('stas_lang') as Language;
+            if (updatedLang === 'EN' || updatedLang === 'ID') {
+                setLanguage(updatedLang);
+            }
+        };
 
-    const currentDateFormatted = new Intl.DateTimeFormat('id-ID', {
-        weekday: 'long',
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric',
-    }).format(new Date());
+        window.addEventListener('storage', handleStorageChange);
+        return () => window.removeEventListener('storage', handleStorageChange);
+    }, []);
+
+    const isEn = language === 'EN';
+
+    const statCards = [
+        {
+            title: isEn ? 'Research Projects' : 'Proyek Riset',
+            subtitle: isEn ? 'Active & completed R&D' : 'R&D aktif & terapan',
+            count: stats?.projects_count || 0,
+            icon: Briefcase,
+            color: 'emerald',
+            href: '#projects',
+        },
+        {
+            title: isEn ? 'Indexed Publications' : 'Publikasi Ilmiah',
+            subtitle: isEn ? 'Scopus Q1 & IEEE journals' : 'Jurnal Scopus Q1 & IEEE',
+            count: stats?.publications_count || 0,
+            icon: BookOpen,
+            color: 'teal',
+            href: '#publications',
+        },
+        {
+            title: isEn ? 'Strategic Partners' : 'Mitra Industri',
+            subtitle: isEn ? 'Corporate & global institutions' : 'Korporasi & universitas global',
+            count: stats?.partners_count || 0,
+            icon: Building2,
+            color: 'blue',
+            href: '#partners',
+        },
+        {
+            title: isEn ? 'Research Domains' : 'Domain Riset',
+            subtitle: isEn ? 'Specialized focus groups' : 'Kelompok keahlian khusus',
+            count: stats?.domains_count || 0,
+            icon: Layers,
+            color: 'violet',
+            href: '#domains',
+        },
+        {
+            title: isEn ? 'Symposia & Events' : 'Simposium & Agenda',
+            subtitle: isEn ? 'Conferences & workshops' : 'Konferensi & lokakarya',
+            count: stats?.events_count || 0,
+            icon: Calendar,
+            color: 'amber',
+            href: '#events',
+        },
+        {
+            title: isEn ? 'Enterprise Services' : 'Layanan Industri',
+            subtitle: isEn ? 'Consulting & lab solutions' : 'Konsultasi & solusi lab',
+            count: stats?.services_count || 0,
+            icon: FlaskConical,
+            color: 'indigo',
+            href: '#services',
+        },
+    ];
+
+    const quickActions = [
+        {
+            label: isEn ? 'Add Research Project' : 'Tambah Proyek Riset',
+            description: isEn ? 'Register new R&D or applied grant project' : 'Daftarkan proyek riset atau hibah baru',
+            icon: Plus,
+            href: '#projects',
+        },
+        {
+            label: isEn ? 'Upload Publication' : 'Unggah Publikasi',
+            description: isEn ? 'Add DOI, IEEE / Scopus Q1 journal paper' : 'Tambah DOI jurnal terindeks Scopus/IEEE',
+            icon: BookOpen,
+            href: '#publications',
+        },
+        {
+            label: isEn ? 'Partner Partnership' : 'Kelola Mitra Kerjasama',
+            description: isEn ? 'Manage industry MoUs and lab agreements' : 'Kelola MoU industri dan kerjasama lab',
+            icon: Building2,
+            href: '#partners',
+        },
+        {
+            label: isEn ? 'Publish News / Whitepaper' : 'Terbitkan Berita / Artikel',
+            description: isEn ? 'Release research highlights and updates' : 'Rilis highlight riset dan kabar terbaru',
+            icon: Newspaper,
+            href: '#articles',
+        },
+    ];
 
     return (
-        <AdminLayout currentMenu="dashboard" siteConfig={siteConfig}>
-            <Head title="Dashboard Overview - CoE STAS-RG Projects" />
-
-            <div className="space-y-6">
-                
-                {/* 1. Welcome Header Banner */}
+        <AdminLayout
+            title={isEn ? 'Dashboard' : 'Dasbor'}
+            siteConfig={siteConfig}
+        >
+            <div className="space-y-8">
+                {/* 1. Header Banner & Live Status */}
                 <motion.div
                     initial={{ opacity: 0, y: 12 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.3 }}
-                    className="p-6 sm:p-8 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-6"
+                    className="p-6 md:p-8 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-6"
                 >
-                    <div className="space-y-1.5 max-w-2xl">
-                        <div className="text-xs font-semibold text-slate-400 dark:text-slate-500">
-                            {currentDateFormatted}
+                    <div className="space-y-2">
+                        <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-[#EDFBF1] dark:bg-[#10381C] text-[#107E27] dark:text-[#3FD27B] text-xs font-bold">
+                            <span className="w-2 h-2 rounded-full bg-[#1AC13B] animate-pulse" />
+                            <span>{isEn ? 'Control Hub Active' : 'Pusat Kendali Aktif'}</span>
                         </div>
-                        <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
-                            Selamat Datang, {user?.name || 'Administrator'}
-                        </h1>
-                        <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
-                            Pusat kendali riset terintegrasi {siteConfig?.center_name || 'CoE STAS-RG'}. Kelola lembar publikasi resmi A4, klaster inovasi teknologi, publikasi jurnal, dan kemitraan strategis.
+                        <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+                            {siteConfig?.center_name || 'CoE STAS-RG'}{' '}
+                            <span className="text-[#107E27] dark:text-[#1AC13B]">
+                                {isEn ? 'Administration Portal' : 'Portal Manajemen'}
+                            </span>
+                        </h2>
+                        <p className="text-sm text-slate-600 dark:text-slate-400 max-w-2xl">
+                            {isEn
+                                ? 'Unified content management for research tracks, industrial partnerships, Scopus/IEEE publications, and enterprise testing services at Telkom University.'
+                                : 'Pengelolaan terpadu untuk riset terapan, kemitraan industri, publikasi Scopus/IEEE, serta layanan pengujian industri di Telkom University.'}
                         </p>
                     </div>
 
                     <div className="flex flex-wrap items-center gap-3 shrink-0">
-                        {/* Secondary Button: Lihat Showcase */}
                         <Link
                             href="/"
-                            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-750 hover:border-slate-300 dark:hover:border-slate-600 transition-all cursor-pointer"
+                            target="_blank"
+                            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-bold text-slate-800 dark:text-slate-200 hover:text-[#107E27] dark:hover:text-[#1AC13B] hover:border-[#1AC13B]/50 transition-colors"
                         >
-                            <Globe className="w-4 h-4 text-slate-500 dark:text-slate-400" />
-                            <span>Lihat Showcase</span>
+                            <ExternalLink className="w-4 h-4 text-[#1AC13B]" />
+                            <span>{isEn ? 'Preview Live Site' : 'Lihat Web Publik'}</span>
                         </Link>
-
-                        {/* Primary Button: + Buat Project Baru */}
-                        <Link
-                            href="/admin/projects"
-                            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#1AC13B] hover:bg-[#159A2F] text-white text-xs font-black transition-all cursor-pointer"
+                        <a
+                            href="#quick-actions"
+                            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#1AC13B] hover:bg-[#16a331] text-white text-xs font-bold transition-colors cursor-pointer"
                         >
                             <Plus className="w-4 h-4" />
-                            <span>Buat Flyer Baru</span>
-                        </Link>
+                            <span>{isEn ? 'Quick Create' : 'Tambah Konten'}</span>
+                        </a>
                     </div>
                 </motion.div>
 
-                {/* 2. Key Stats Metrics Grid (6 Cards) */}
-                <motion.div
-                    initial={{ opacity: 0, y: 12 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.35, delay: 0.05 }}
-                    className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5"
-                >
-                    {/* Stat 1: Total Riset */}
-                    <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 flex flex-col justify-between hover:border-[#1AC13B]/40 transition-colors">
-                        <div className="flex items-center justify-between">
-                            <span className="text-[11px] font-bold tracking-wider uppercase text-slate-400 dark:text-slate-500">
-                                Total Riset
-                            </span>
-                            <div className="w-6 h-6 rounded-lg bg-[#EDFBF1] dark:bg-[#10381C] text-[#107E27] dark:text-[#3FD27B] flex items-center justify-center">
-                                <TrendingUp className="w-3.5 h-3.5" />
-                            </div>
-                        </div>
-                        <div className="mt-3">
-                            <div className="text-2xl font-black text-slate-900 dark:text-white">
-                                {stats.total_riset}
-                            </div>
-                            <div className="text-[10px] font-medium text-slate-400 dark:text-slate-500 mt-0.5 flex items-center gap-1">
-                                <span className="text-[#107E27] dark:text-[#3FD27B] font-bold">↗</span> Inovasi Aktif
-                            </div>
-                        </div>
+                {/* 2. Key Performance Indicators Grid */}
+                <div>
+                    <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+                            {isEn ? 'Research & Engagement Overview' : 'Ringkasan Riset & Kolaborasi'}
+                        </h3>
+                        <span className="text-xs text-slate-400 dark:text-slate-500 font-medium">
+                            {isEn ? 'Real-time database metrics' : 'Metrik database terkini'}
+                        </span>
                     </div>
 
-                    {/* Stat 2: Di Landing */}
-                    <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 flex flex-col justify-between hover:border-[#1AC13B]/40 transition-colors">
-                        <div className="flex items-center justify-between">
-                            <span className="text-[11px] font-bold tracking-wider uppercase text-slate-400 dark:text-slate-500">
-                                Di Landing
-                            </span>
-                            <div className="w-6 h-6 rounded-lg bg-[#EDFBF1] dark:bg-[#10381C] text-[#107E27] dark:text-[#3FD27B] flex items-center justify-center">
-                                <Globe className="w-3.5 h-3.5" />
-                            </div>
-                        </div>
-                        <div className="mt-3">
-                            <div className="text-2xl font-black text-slate-900 dark:text-white">
-                                {stats.di_landing}
-                            </div>
-                            <div className="text-[10px] font-medium text-[#107E27] dark:text-[#3FD27B] mt-0.5 flex items-center gap-1">
-                                <span className="w-1.5 h-1.5 rounded-full bg-[#1AC13B]" /> Publik & Live
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Stat 3: Draft Internal */}
-                    <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 flex flex-col justify-between hover:border-amber-400/40 transition-colors">
-                        <div className="flex items-center justify-between">
-                            <span className="text-[11px] font-bold tracking-wider uppercase text-slate-400 dark:text-slate-500">
-                                Draft Flyer
-                            </span>
-                            <div className="w-6 h-6 rounded-lg bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 flex items-center justify-center">
-                                <FileEdit className="w-3.5 h-3.5" />
-                            </div>
-                        </div>
-                        <div className="mt-3">
-                            <div className="text-2xl font-black text-slate-900 dark:text-white">
-                                {stats.draft_internal}
-                            </div>
-                            <div className="text-[10px] font-medium text-slate-400 dark:text-slate-500 mt-0.5">
-                                Dalam pengerjaan
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Stat 4: Klaster Riset */}
-                    <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 flex flex-col justify-between hover:border-blue-400/40 transition-colors">
-                        <div className="flex items-center justify-between">
-                            <span className="text-[11px] font-bold tracking-wider uppercase text-slate-400 dark:text-slate-500">
-                                Klaster Riset
-                            </span>
-                            <div className="w-6 h-6 rounded-lg bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center">
-                                <Layers className="w-3.5 h-3.5" />
-                            </div>
-                        </div>
-                        <div className="mt-3">
-                            <div className="text-2xl font-black text-slate-900 dark:text-white">
-                                {stats.klaster_riset}
-                            </div>
-                            <div className="text-[10px] font-medium text-slate-400 dark:text-slate-500 mt-0.5">
-                                Domain Inovasi
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Stat 5: Publikasi Ilmiah */}
-                    <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 flex flex-col justify-between hover:border-purple-400/40 transition-colors">
-                        <div className="flex items-center justify-between">
-                            <span className="text-[11px] font-bold tracking-wider uppercase text-slate-400 dark:text-slate-500">
-                                Publikasi
-                            </span>
-                            <div className="w-6 h-6 rounded-lg bg-purple-50 dark:bg-purple-950/40 text-purple-600 dark:text-purple-400 flex items-center justify-center">
-                                <BookOpen className="w-3.5 h-3.5" />
-                            </div>
-                        </div>
-                        <div className="mt-3">
-                            <div className="text-2xl font-black text-slate-900 dark:text-white">
-                                {stats.publikasi_ilmiah}
-                            </div>
-                            <div className="text-[10px] font-medium text-slate-400 dark:text-slate-500 mt-0.5">
-                                Q1 / Scopus / IEEE
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Stat 6: Mitra Industri */}
-                    <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 flex flex-col justify-between hover:border-pink-400/40 transition-colors">
-                        <div className="flex items-center justify-between">
-                            <span className="text-[11px] font-bold tracking-wider uppercase text-slate-400 dark:text-slate-500">
-                                Mitra Industri
-                            </span>
-                            <div className="w-6 h-6 rounded-lg bg-pink-50 dark:bg-pink-950/40 text-pink-600 dark:text-pink-400 flex items-center justify-center">
-                                <Briefcase className="w-3.5 h-3.5" />
-                            </div>
-                        </div>
-                        <div className="mt-3">
-                            <div className="text-2xl font-black text-slate-900 dark:text-white">
-                                {stats.mitra_kustom}
-                            </div>
-                            <div className="text-[10px] font-medium text-slate-400 dark:text-slate-500 mt-0.5">
-                                Mitra Kolaboratif
-                            </div>
-                        </div>
-                    </div>
-                </motion.div>
-
-                {/* 3. Main Two-Column Layout (Project Table & Side Cards) */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-                    
-                    {/* Left Column (Wide 2/3): Project Riset & Flyer Terbaru */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 12 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.4, delay: 0.1 }}
-                        className="lg:col-span-2 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 p-5 sm:p-6 space-y-5"
-                    >
-                        {/* Section Header */}
-                        <div className="flex items-start justify-between gap-4">
-                            <div>
-                                <h2 className="text-base sm:text-lg font-black text-slate-900 dark:text-white tracking-tight">
-                                    Project Riset & Flyer Terbaru
-                                </h2>
-                                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                                    Daftar dokumen flyer inovasi visual yang siap diedit, dicetak/disimpan ke PDF, dan diunduh sebagai PNG.
-                                </p>
-                            </div>
-
-                            <Link
-                                href="/admin/projects"
-                                className="inline-flex items-center gap-1 text-xs font-bold text-[#107E27] dark:text-[#3FD27B] hover:underline shrink-0"
-                            >
-                                <span>Lihat Semua ({flyerProjects.length})</span>
-                                <span>›</span>
-                            </Link>
-                        </div>
-
-                        {/* Filter Toolbar */}
-                        <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
-                            
-                            {/* Left Tabs: Semua / Published / Draft */}
-                            <div className="flex items-center gap-1.5 p-1 bg-slate-100/80 dark:bg-slate-800 rounded-xl">
-                                <button
-                                    onClick={() => setSelectedTab('all')}
-                                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                                        selectedTab === 'all'
-                                            ? 'bg-[#1AC13B] text-white'
-                                            : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                                    }`}
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5 sm:gap-4">
+                        {statCards.map((card, idx) => {
+                            const Icon = card.icon;
+                            return (
+                                <motion.a
+                                    key={card.title}
+                                    href={card.href}
+                                    initial={{ opacity: 0, y: 15 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ duration: 0.25, delay: idx * 0.04 }}
+                                    className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-[#1AC13B]/60 dark:hover:border-[#1AC13B]/60 transition-all group flex flex-col justify-between"
                                 >
-                                    Semua
-                                </button>
-                                <button
-                                    onClick={() => setSelectedTab('published')}
-                                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                                        selectedTab === 'published'
-                                            ? 'bg-[#1AC13B] text-white'
-                                            : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                                    }`}
-                                >
-                                    Published
-                                </button>
-                                <button
-                                    onClick={() => setSelectedTab('draft')}
-                                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                                        selectedTab === 'draft'
-                                            ? 'bg-[#1AC13B] text-white'
-                                            : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                                    }`}
-                                >
-                                    Draft
-                                </button>
-                            </div>
-
-                            {/* Center & Right Filters */}
-                            <div className="flex flex-wrap items-center gap-2">
-                                
-                                {/* Category Dropdown */}
-                                <div className="relative">
-                                    <button
-                                        onClick={() => setCategoryDropdownOpen(!categoryDropdownOpen)}
-                                        onBlur={() => setTimeout(() => setCategoryDropdownOpen(false), 200)}
-                                        className="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-750 inline-flex items-center gap-2 cursor-pointer"
-                                    >
-                                        <span>
-                                            {categoryFilter === 'all' ? 'Semua Kategori' : categoryFilter}
-                                        </span>
-                                        <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
-                                    </button>
-
-                                    {categoryDropdownOpen && (
-                                        <div className="absolute left-0 mt-1 w-56 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-1 z-30 animate-in fade-in">
-                                            <button
-                                                onClick={() => setCategoryFilter('all')}
-                                                className={`w-full text-left px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                                                    categoryFilter === 'all'
-                                                        ? 'bg-[#EDFBF1] text-[#107E27] font-bold'
-                                                        : 'hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300'
-                                                }`}
-                                            >
-                                                Semua Kategori
-                                            </button>
-                                            {availableCategories.map((cat) => (
-                                                <button
-                                                    key={cat}
-                                                    onClick={() => setCategoryFilter(cat)}
-                                                    className={`w-full text-left px-3 py-1.5 rounded-lg text-xs font-medium transition-colors truncate ${
-                                                        categoryFilter === cat
-                                                            ? 'bg-[#EDFBF1] text-[#107E27] font-bold'
-                                                            : 'hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300'
-                                                    }`}
-                                                >
-                                                    {cat}
-                                                </button>
-                                            ))}
+                                    <div className="flex items-center justify-between mb-3">
+                                        <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 group-hover:bg-[#EDFBF1] group-hover:text-[#107E27] dark:group-hover:bg-[#10381C] dark:group-hover:text-[#3FD27B] flex items-center justify-center transition-colors">
+                                            <Icon className="w-4 h-4" />
                                         </div>
-                                    )}
-                                </div>
-
-                                {/* Sort Dropdown */}
-                                <div className="relative">
-                                    <button
-                                        onClick={() => setSortDropdownOpen(!sortDropdownOpen)}
-                                        onBlur={() => setTimeout(() => setSortDropdownOpen(false), 200)}
-                                        className="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-750 inline-flex items-center gap-2 cursor-pointer"
-                                    >
-                                        <span>
-                                            {sortOrder === 'desc' ? 'Terbaru Diperbarui' : 'Terlama Diperbarui'}
-                                        </span>
-                                        <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
-                                    </button>
-
-                                    {sortDropdownOpen && (
-                                        <div className="absolute right-0 mt-1 w-44 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-1 z-30 animate-in fade-in">
-                                            <button
-                                                onClick={() => setSortOrder('desc')}
-                                                className={`w-full text-left px-3 py-1.5 rounded-lg text-xs font-medium ${
-                                                    sortOrder === 'desc'
-                                                        ? 'bg-[#EDFBF1] text-[#107E27] font-bold'
-                                                        : 'hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300'
-                                                }`}
-                                            >
-                                                Terbaru Diperbarui
-                                            </button>
-                                            <button
-                                                onClick={() => setSortOrder('asc')}
-                                                className={`w-full text-left px-3 py-1.5 rounded-lg text-xs font-medium ${
-                                                    sortOrder === 'asc'
-                                                        ? 'bg-[#EDFBF1] text-[#107E27] font-bold'
-                                                        : 'hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300'
-                                                }`}
-                                            >
-                                                Terlama Diperbarui
-                                            </button>
-                                        </div>
-                                    )}
-                                </div>
-
-                                {/* Table Search Input */}
-                                <div className="relative">
-                                    <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-                                    <input
-                                        type="text"
-                                        value={searchQuery}
-                                        onChange={(e) => setSearchQuery(e.target.value)}
-                                        placeholder="Cari riset, headline..."
-                                        className="pl-8 pr-3 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-[#1AC13B]"
-                                    />
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Status Bar */}
-                        <div className="flex items-center justify-between text-[11px] text-slate-400 dark:text-slate-500 pt-2 border-t border-slate-100 dark:border-slate-800">
-                            <div>
-                                Menampilkan {filteredProjects.length} dari {flyerProjects.length} proyek riset
-                            </div>
-                            <div>
-                                Sort: <span className="font-semibold text-slate-700 dark:text-slate-300">Pembaruan ({sortOrder.toUpperCase()})</span>
-                            </div>
-                        </div>
-
-                        {/* Project Table */}
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-left border-collapse">
-                                <thead>
-                                    <tr className="border-b border-slate-200/80 dark:border-slate-800 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
-                                        <th className="py-2.5 px-3">Thumbnail</th>
-                                        <th className="py-2.5 px-3">Nama Riset & Headline</th>
-                                        <th className="py-2.5 px-3">Kategori & Mitra</th>
-                                        <th className="py-2.5 px-3">Status</th>
-                                        <th className="py-2.5 px-3">Update</th>
-                                        <th className="py-2.5 px-3 text-right">Aksi Flyer</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-xs">
-                                    {filteredProjects.length === 0 ? (
-                                        <tr>
-                                            <td colSpan={6} className="py-8 text-center text-slate-400">
-                                                Tidak ada data proyek riset yang sesuai dengan filter.
-                                            </td>
-                                        </tr>
-                                    ) : (
-                                        filteredProjects.map((item) => (
-                                            <tr
-                                                key={item.id}
-                                                className="group hover:bg-slate-50/70 dark:hover:bg-slate-800/40 transition-colors"
-                                            >
-                                                {/* Thumbnail */}
-                                                <td className="py-3 px-3">
-                                                    <div className="w-12 h-10 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 shrink-0">
-                                                        <img
-                                                            src={item.thumbnail_url}
-                                                            alt={item.title}
-                                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                                                        />
-                                                    </div>
-                                                </td>
-
-                                                {/* Title & Headline */}
-                                                <td className="py-3 px-3 max-w-[200px]">
-                                                    <div className="font-extrabold text-slate-900 dark:text-white tracking-tight truncate">
-                                                        {item.title}
-                                                    </div>
-                                                    <div className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
-                                                        {item.headline}
-                                                    </div>
-                                                </td>
-
-                                                {/* Category & Partner */}
-                                                <td className="py-3 px-3 max-w-[180px]">
-                                                    <div className="text-[11px] font-bold text-[#107E27] dark:text-[#3FD27B] truncate">
-                                                        {item.category}
-                                                    </div>
-                                                    <div className="text-[10px] text-slate-400 truncate">
-                                                        {item.partner}
-                                                    </div>
-                                                </td>
-
-                                                {/* Status Badge */}
-                                                <td className="py-3 px-3">
-                                                    {item.status === 'Published' ? (
-                                                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-[#EDFBF1] dark:bg-[#10381C] text-[#107E27] dark:text-[#3FD27B] border border-[#B2EFC3]/60 dark:border-[#1A5C2F]">
-                                                            <span className="w-1.5 h-1.5 rounded-full bg-[#1AC13B]" />
-                                                            Published
-                                                        </span>
-                                                    ) : (
-                                                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-900">
-                                                            <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-                                                            Draft
-                                                        </span>
-                                                    )}
-                                                </td>
-
-                                                {/* Update Date */}
-                                                <td className="py-3 px-3 text-[11px] text-slate-500 dark:text-slate-400 whitespace-nowrap">
-                                                    {item.updated_at}
-                                                </td>
-
-                                                {/* Actions */}
-                                                <td className="py-3 px-3 text-right whitespace-nowrap">
-                                                    <div className="inline-flex items-center gap-1.5 text-slate-400">
-                                                        <button
-                                                            onClick={() => setPreviewProject(item)}
-                                                            className="p-1.5 hover:text-[#107E27] dark:hover:text-[#1AC13B] hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors cursor-pointer"
-                                                            title="Preview Lembar Flyer A4"
-                                                        >
-                                                            <Eye className="w-3.5 h-3.5" />
-                                                        </button>
-                                                        <Link
-                                                            href="/admin/projects"
-                                                            className="p-1.5 hover:text-[#107E27] dark:hover:text-[#1AC13B] hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
-                                                            title="Edit Konten Riset"
-                                                        >
-                                                            <Edit3 className="w-3.5 h-3.5" />
-                                                        </Link>
-                                                        <button
-                                                            onClick={() => alert(`Mengunduh lembar flyer A4 resmi untuk "${item.title}"...`)}
-                                                            className="p-1.5 hover:text-[#107E27] dark:hover:text-[#1AC13B] hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors cursor-pointer"
-                                                            title="Cetak / Simpan PDF"
-                                                        >
-                                                            <Printer className="w-3.5 h-3.5" />
-                                                        </button>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        ))
-                                    )}
-                                </tbody>
-                            </table>
-                        </div>
-                    </motion.div>
-
-                    {/* Right Column (Narrow 1/3): Cluster Distribution & Shortcuts */}
-                    <div className="space-y-6">
-                        
-                        {/* Card 1: Distribusi Klaster Riset */}
-                        <motion.div
-                            initial={{ opacity: 0, y: 12 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.4, delay: 0.15 }}
-                            className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 p-5 space-y-4"
-                        >
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-2">
-                                    <div className="w-6 h-6 rounded-lg bg-[#EDFBF1] dark:bg-[#10381C] text-[#107E27] dark:text-[#3FD27B] flex items-center justify-center">
-                                        <Layers className="w-3.5 h-3.5" />
+                                        <ArrowUpRight className="w-3.5 h-3.5 text-slate-300 dark:text-slate-600 group-hover:text-[#1AC13B] transition-colors" />
                                     </div>
-                                    <h3 className="text-xs font-extrabold uppercase tracking-wider text-slate-900 dark:text-white">
-                                        Distribusi Klaster Riset
-                                    </h3>
+                                    <div>
+                                        <div className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+                                            {card.count}
+                                        </div>
+                                        <div className="text-xs font-bold text-slate-700 dark:text-slate-300 truncate mt-0.5">
+                                            {card.title}
+                                        </div>
+                                        <div className="text-[10px] text-slate-400 dark:text-slate-500 truncate">
+                                            {card.subtitle}
+                                        </div>
+                                    </div>
+                                </motion.a>
+                            );
+                        })}
+                    </div>
+                </div>
+
+                {/* 3. Quick Action Cards */}
+                <div id="quick-actions">
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-4">
+                        {isEn ? 'Quick Actions' : 'Aksi Cepat'}
+                    </h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        {quickActions.map((action, idx) => {
+                            const Icon = action.icon;
+                            return (
+                                <a
+                                    key={action.label}
+                                    href={action.href}
+                                    className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-[#1AC13B] dark:hover:border-[#1AC13B] transition-all group flex items-start gap-3.5"
+                                >
+                                    <div className="w-9 h-9 rounded-lg bg-[#EDFBF1] dark:bg-[#10381C] text-[#107E27] dark:text-[#3FD27B] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                                        <Icon className="w-4 h-4" />
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <div className="text-xs font-bold text-slate-900 dark:text-white group-hover:text-[#107E27] dark:group-hover:text-[#1AC13B] transition-colors">
+                                            {action.label}
+                                        </div>
+                                        <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-1">
+                                            {action.description}
+                                        </div>
+                                    </div>
+                                    <ChevronRight className="w-4 h-4 text-slate-400 shrink-0 self-center group-hover:translate-x-0.5 transition-transform" />
+                                </a>
+                            );
+                        })}
+                    </div>
+                </div>
+
+                {/* 4. Main Two-Column Layout */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                    {/* Left Column: Recent Projects & Research Domains (7/12) */}
+                    <div className="lg:col-span-7 space-y-6">
+                        {/* Section: Recent Research Projects */}
+                        <div id="projects" className="p-5 sm:p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+                            <div className="flex items-center justify-between pb-4 mb-4 border-b border-slate-100 dark:border-slate-800">
+                                <div>
+                                    <h4 className="text-sm font-extrabold text-slate-900 dark:text-white">
+                                        {isEn ? 'Recent Research Projects' : 'Proyek Riset Terkini'}
+                                    </h4>
+                                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                                        {isEn ? 'Latest R&D tracks, grants, and prototypes' : 'Inovasi R&D, hibah riset, dan prototipe terbaru'}
+                                    </p>
                                 </div>
-                                <span className="text-[11px] font-bold text-slate-400">
-                                    {clusters.length} Klaster
+                                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                                    {recentProjects.length} {isEn ? 'items' : 'item'}
                                 </span>
                             </div>
 
-                            {/* Progress Bars */}
-                            <div className="space-y-3 pt-1">
-                                {clusters.map((cluster, idx) => (
-                                    <div key={idx} className="space-y-1.5">
-                                        <div className="flex items-center justify-between text-xs">
-                                            <span className="font-semibold text-slate-700 dark:text-slate-300 truncate max-w-[190px]">
-                                                {cluster.name}
-                                            </span>
-                                            <span className="text-slate-400 font-mono text-[11px] shrink-0">
-                                                {cluster.percentage}%
-                                            </span>
+                            {recentProjects.length === 0 ? (
+                                <div className="text-center py-8 text-xs text-slate-400">
+                                    {isEn ? 'No research projects registered yet.' : 'Belum ada proyek riset yang terdaftar.'}
+                                </div>
+                            ) : (
+                                <div className="space-y-3">
+                                    {recentProjects.map((project) => (
+                                        <div
+                                            key={project.id}
+                                            className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3 group hover:border-[#1AC13B]/60 transition-colors"
+                                        >
+                                            <div className="space-y-1 min-w-0 flex-1">
+                                                <div className="flex items-center gap-2">
+                                                    <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#EDFBF1] dark:bg-[#10381C] text-[#107E27] dark:text-[#3FD27B]">
+                                                        {project.category || 'R&D Track'}
+                                                    </span>
+                                                    {project.featured && (
+                                                        <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400">
+                                                            Featured
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                <h5 className="text-xs font-bold text-slate-900 dark:text-white group-hover:text-[#107E27] dark:group-hover:text-[#1AC13B] transition-colors line-clamp-1">
+                                                    {project.title}
+                                                </h5>
+                                                {project.lead_researcher && (
+                                                    <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
+                                                        <span className="font-semibold">{isEn ? 'Lead:' : 'Ketua:'}</span> {project.lead_researcher}
+                                                    </p>
+                                                )}
+                                            </div>
+
+                                            <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
+                                                <Link
+                                                    href="/"
+                                                    target="_blank"
+                                                    className="px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-[11px] font-semibold text-slate-700 dark:text-slate-300 hover:text-[#107E27] dark:hover:text-[#1AC13B] transition-colors"
+                                                >
+                                                    {isEn ? 'View' : 'Lihat'}
+                                                </Link>
+                                            </div>
                                         </div>
-                                        <div className="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                                            <div
-                                                className="h-full bg-[#1AC13B] rounded-full transition-all duration-500"
-                                                style={{ width: `${cluster.percentage}%` }}
-                                            />
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Section: Research Domains Grid */}
+                        <div id="domains" className="p-5 sm:p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+                            <div className="flex items-center justify-between pb-4 mb-4 border-b border-slate-100 dark:border-slate-800">
+                                <div>
+                                    <h4 className="text-sm font-extrabold text-slate-900 dark:text-white">
+                                        {isEn ? 'Research Focus Domains' : 'Domain Keahlian Riset'}
+                                    </h4>
+                                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                                        {isEn ? '8 strategic focus clusters of CoE STAS-RG' : '8 klaster fokus strategis CoE STAS-RG'}
+                                    </p>
+                                </div>
+                                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#EDFBF1] dark:bg-[#10381C] text-[#107E27] dark:text-[#3FD27B]">
+                                    {domains.length} {isEn ? 'Domains' : 'Domain'}
+                                </span>
+                            </div>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                {domains.map((domain) => (
+                                    <div
+                                        key={domain.id}
+                                        className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 flex items-start gap-3 hover:border-[#1AC13B]/60 transition-colors"
+                                    >
+                                        <div className="w-7 h-7 rounded-lg bg-[#EDFBF1] dark:bg-[#10381C] text-[#107E27] dark:text-[#3FD27B] flex items-center justify-center font-bold text-xs shrink-0">
+                                            {domain.domain_number}
+                                        </div>
+                                        <div className="min-w-0 flex-1">
+                                            <div className="text-xs font-bold text-slate-900 dark:text-white truncate">
+                                                {domain.title}
+                                            </div>
+                                            {domain.summary && (
+                                                <div className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-1 mt-0.5">
+                                                    {domain.summary}
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                 ))}
                             </div>
-                        </motion.div>
-
-                        {/* Card 2: Pintasan Modul Website */}
-                        <motion.div
-                            initial={{ opacity: 0, y: 12 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.4, delay: 0.2 }}
-                            className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 p-5 space-y-3.5"
-                        >
-                            <h3 className="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-                                Pintasan Navigasi Modul
-                            </h3>
-
-                            <div className="grid grid-cols-2 gap-2.5">
-                                {/* Shortcut 1: Proyek & Flyer */}
-                                <Link
-                                    href="/admin/projects"
-                                    className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 hover:bg-[#EDFBF1] dark:hover:bg-[#10381C]/60 hover:border-[#B2EFC3] dark:hover:border-[#1A5C2F] transition-all group"
-                                >
-                                    <FolderKanban className="w-4 h-4 text-slate-600 dark:text-slate-400 group-hover:text-[#107E27] dark:group-hover:text-[#3FD27B] transition-colors" />
-                                    <div className="mt-2 text-xs font-bold text-slate-900 dark:text-white">
-                                        Proyek Riset
-                                    </div>
-                                    <div className="text-[10px] text-slate-400 dark:text-slate-500">
-                                        Flyer A4 siap cetak
-                                    </div>
-                                </Link>
-
-                                {/* Shortcut 2: Klaster Riset */}
-                                <Link
-                                    href="/admin/domains"
-                                    className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 hover:bg-[#EDFBF1] dark:hover:bg-[#10381C]/60 hover:border-[#B2EFC3] dark:hover:border-[#1A5C2F] transition-all group"
-                                >
-                                    <Layers className="w-4 h-4 text-[#107E27] dark:text-[#3FD27B]" />
-                                    <div className="mt-2 text-xs font-bold text-slate-900 dark:text-white">
-                                        Klaster Riset
-                                    </div>
-                                    <div className="text-[10px] text-slate-400 dark:text-slate-500">
-                                        8 Domain strategis
-                                    </div>
-                                </Link>
-
-                                {/* Shortcut 3: Publikasi Q1 */}
-                                <Link
-                                    href="/admin/publications"
-                                    className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 hover:bg-[#EDFBF1] dark:hover:bg-[#10381C]/60 hover:border-[#B2EFC3] dark:hover:border-[#1A5C2F] transition-all group"
-                                >
-                                    <BookOpen className="w-4 h-4 text-purple-600 dark:text-purple-400" />
-                                    <div className="mt-2 text-xs font-bold text-slate-900 dark:text-white">
-                                        Publikasi Ilmiah
-                                    </div>
-                                    <div className="text-[10px] text-slate-400 dark:text-slate-500">
-                                        Scopus & IEEE papers
-                                    </div>
-                                </Link>
-
-                                {/* Shortcut 4: Mitra & Layanan */}
-                                <Link
-                                    href="/admin/services"
-                                    className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 hover:bg-[#EDFBF1] dark:hover:bg-[#10381C]/60 hover:border-[#B2EFC3] dark:hover:border-[#1A5C2F] transition-all group"
-                                >
-                                    <Briefcase className="w-4 h-4 text-pink-600 dark:text-pink-400" />
-                                    <div className="mt-2 text-xs font-bold text-slate-900 dark:text-white">
-                                        Layanan Industri
-                                    </div>
-                                    <div className="text-[10px] text-slate-400 dark:text-slate-500">
-                                        Kemitraan & Advisory
-                                    </div>
-                                </Link>
-                            </div>
-                        </motion.div>
-                    </div>
-                </div>
-
-                {/* 4. Bottom Full-Width CTA Banner */}
-                <motion.div
-                    initial={{ opacity: 0, y: 12 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.4, delay: 0.25 }}
-                    className="p-6 sm:p-8 rounded-2xl bg-[#1AC13B] text-white flex flex-col md:flex-row items-center justify-between gap-6 overflow-hidden relative"
-                >
-                    <div className="flex items-center gap-5 z-10">
-                        <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center shrink-0 border border-white/30">
-                            <img
-                                src="/assets/images/telu_noname.png"
-                                alt="STAS Mascot"
-                                className="w-9 h-9 object-contain"
-                                onError={(e) => {
-                                    (e.target as HTMLImageElement).src = '/stas.png';
-                                }}
-                            />
                         </div>
-                        <div className="space-y-1">
-                            <h3 className="text-lg sm:text-xl font-black tracking-tight text-white">
-                                Ingin Menerbitkan Lembar Riset & Flyer Baru?
-                            </h3>
-                            <p className="text-xs sm:text-sm text-white/90 max-w-2xl leading-relaxed">
-                                Lengkapi foto prototype riset, spesifikasi teknologi, poin manfaat, dan tautan video untuk langsung meng-generate lembar publikasi resmi A4 siap cetak.
+
+                        {/* Section: News & Whitepapers */}
+                        <div id="articles" className="p-5 sm:p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+                            <div className="flex items-center justify-between pb-4 mb-4 border-b border-slate-100 dark:border-slate-800">
+                                <div>
+                                    <h4 className="text-sm font-extrabold text-slate-900 dark:text-white">
+                                        {isEn ? 'Recent Articles & News' : 'Berita & Artikel Terkini'}
+                                    </h4>
+                                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                                        {isEn ? 'Published insights and media announcements' : 'Wawasan ilmiah dan siaran pers terbaru'}
+                                    </p>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                                        {recentArticles.length} {isEn ? 'Articles' : 'Artikel'}
+                                    </span>
+                                    <Link
+                                        href="/admin/articles"
+                                        className="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-[#EDFBF1] dark:bg-[#10381C] text-[#107E27] dark:text-[#3FD27B] hover:bg-[#B2EFC3]/60 transition-colors"
+                                    >
+                                        {isEn ? 'Manage All →' : 'Kelola Semua →'}
+                                    </Link>
+                                </div>
+                            </div>
+
+                            <div className="space-y-3">
+                                {recentArticles.map((article) => (
+                                    <div
+                                        key={article.id}
+                                        className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 flex items-start justify-between gap-3"
+                                    >
+                                        <div className="space-y-1 min-w-0 flex-1">
+                                            <div className="flex items-center gap-2 text-[10px] text-slate-400">
+                                                <span className="font-bold text-[#107E27] dark:text-[#3FD27B]">
+                                                    {article.tag}
+                                                </span>
+                                                <span>•</span>
+                                                <span>{article.date}</span>
+                                            </div>
+                                            <div className="text-xs font-bold text-slate-900 dark:text-white line-clamp-1">
+                                                {article.title}
+                                            </div>
+                                        </div>
+                                        {article.read_time && (
+                                            <span className="text-[10px] text-slate-400 shrink-0 self-center">
+                                                {article.read_time}
+                                            </span>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Right Column: Publications, Symposia, and Institutional Profile (5/12) */}
+                    <div className="lg:col-span-5 space-y-6">
+                        {/* Section: Latest Indexed Publications */}
+                        <div id="publications" className="p-5 sm:p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+                            <div className="flex items-center justify-between pb-4 mb-4 border-b border-slate-100 dark:border-slate-800">
+                                <div>
+                                    <h4 className="text-sm font-extrabold text-slate-900 dark:text-white">
+                                        {isEn ? 'Latest Publications' : 'Publikasi Ilmiah Terbaru'}
+                                    </h4>
+                                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                                        {isEn ? 'Scopus Q1 & IEEE Transactions papers' : 'Jurnal Scopus Q1 & IEEE Transactions'}
+                                    </p>
+                                </div>
+                                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#EDFBF1] dark:bg-[#10381C] text-[#107E27] dark:text-[#3FD27B]">
+                                    {recentPublications.length} {isEn ? 'Papers' : 'Paper'}
+                                </span>
+                            </div>
+
+                            <div className="space-y-3">
+                                {recentPublications.map((pub) => (
+                                    <div
+                                        key={pub.id}
+                                        className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 space-y-2 hover:border-[#1AC13B]/60 transition-colors"
+                                    >
+                                        <div className="flex items-center justify-between gap-2">
+                                            <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950/70 text-emerald-800 dark:text-emerald-300">
+                                                {pub.badge || 'Q1 Journal'}
+                                            </span>
+                                            <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400">
+                                                {pub.year}
+                                            </span>
+                                        </div>
+
+                                        <h5 className="text-xs font-bold text-slate-900 dark:text-white line-clamp-2">
+                                            {pub.title}
+                                        </h5>
+
+                                        <div className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-1">
+                                            {pub.authors}
+                                        </div>
+
+                                        <div className="flex items-center justify-between pt-1 border-t border-slate-200/60 dark:border-slate-700/60 text-[10px]">
+                                            <span className="font-semibold text-slate-600 dark:text-slate-300 truncate">
+                                                {pub.venue}
+                                            </span>
+                                            {pub.doi && (
+                                                <span className="text-[#107E27] dark:text-[#1AC13B] font-mono shrink-0">
+                                                    DOI Verified
+                                                </span>
+                                            )}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Section: Upcoming Conferences & Symposia */}
+                        <div id="events" className="p-5 sm:p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+                            <div className="flex items-center justify-between pb-4 mb-4 border-b border-slate-100 dark:border-slate-800">
+                                <div>
+                                    <h4 className="text-sm font-extrabold text-slate-900 dark:text-white">
+                                        {isEn ? 'Conferences & Symposia' : 'Simposium & Konferensi'}
+                                    </h4>
+                                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                                        {isEn ? 'IS-STSS 2026 & scheduled events' : 'IS-STSS 2026 & agenda mendatang'}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="space-y-3">
+                                {upcomingEvents.map((evt) => (
+                                    <div
+                                        key={evt.id}
+                                        className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 space-y-2"
+                                    >
+                                        <div className="flex items-center justify-between gap-2">
+                                            <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#EDFBF1] dark:bg-[#10381C] text-[#107E27] dark:text-[#3FD27B]">
+                                                {evt.tag}
+                                            </span>
+                                            <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400">
+                                                {evt.date_display}
+                                            </span>
+                                        </div>
+
+                                        <div className="text-xs font-bold text-slate-900 dark:text-white">
+                                            {evt.title}
+                                        </div>
+
+                                        {evt.location && (
+                                            <div className="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+                                                <span>📍</span>
+                                                <span>{evt.location}</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Section: Institutional Summary */}
+                        <div className="p-5 rounded-2xl bg-gradient-to-br from-[#EDFBF1] to-white dark:from-[#10381C]/40 dark:to-slate-900 border border-[#1AC13B]/30 dark:border-[#1AC13B]/20 space-y-3">
+                            <div className="flex items-center gap-2">
+                                <ShieldCheck className="w-5 h-5 text-[#107E27] dark:text-[#1AC13B]" />
+                                <h4 className="text-xs font-bold text-[#107E27] dark:text-[#3FD27B] uppercase tracking-wider">
+                                    {isEn ? 'Center of Excellence Status' : 'Status Center of Excellence'}
+                                </h4>
+                            </div>
+                            <div className="text-xs text-slate-700 dark:text-slate-300 space-y-1">
+                                <div className="font-bold text-slate-900 dark:text-white">
+                                    {siteConfig?.center_name || 'CoE STAS-RG'}
+                                </div>
+                                <div>
+                                    {siteConfig?.institution || 'Telkom University'} — Bandung, Indonesia
+                                </div>
+                            </div>
+                            <p className="text-[11px] text-slate-600 dark:text-slate-400">
+                                {isEn
+                                    ? 'Designated institutional research center focusing on Energy Transition, Intelligent IoT, and Sustainable Circular Economy.'
+                                    : 'Pusat riset unggulan berfokus pada Transisi Energi, IoT Cerdas, dan Ekonomi Sirkular Berkelanjutan.'}
                             </p>
                         </div>
                     </div>
-
-                    <Link
-                        href="/admin/projects"
-                        className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white text-slate-900 hover:bg-slate-100 text-xs font-black shrink-0 transition-transform hover:scale-105 active:scale-95 cursor-pointer z-10"
-                    >
-                        <span>Buat Sekarang</span>
-                        <ArrowUpRight className="w-4 h-4" />
-                    </Link>
-                </motion.div>
-
+                </div>
             </div>
-
-            {/* Flyer Quick Preview Modal */}
-            {previewProject && (
-                <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
-                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-4 animate-in fade-in zoom-in-95">
-                        <div className="flex items-center justify-between">
-                            <span className="text-xs font-bold uppercase tracking-wider text-[#107E27] dark:text-[#3FD27B]">
-                                Lembar Riset A4 Preview
-                            </span>
-                            <button
-                                onClick={() => setPreviewProject(null)}
-                                className="text-slate-400 hover:text-slate-700 dark:hover:text-white text-xs font-bold cursor-pointer"
-                            >
-                                Tutup ✕
-                            </button>
-                        </div>
-                        <div className="aspect-[4/3] rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800">
-                            <img
-                                src={previewProject.thumbnail_url}
-                                alt={previewProject.title}
-                                className="w-full h-full object-cover"
-                            />
-                        </div>
-                        <div>
-                            <h3 className="text-sm font-extrabold text-slate-900 dark:text-white">
-                                {previewProject.title}
-                            </h3>
-                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                                {previewProject.headline}
-                            </p>
-                            <div className="flex items-center gap-2 mt-3 text-[11px] text-slate-400">
-                                <span>Mitra: <strong className="text-slate-700 dark:text-slate-200">{previewProject.partner}</strong></span>
-                            </div>
-                        </div>
-                        <div className="pt-2 flex gap-2">
-                            <button
-                                onClick={() => {
-                                    alert(`Mencetak dokumen resmi A4: ${previewProject.title}`);
-                                    setPreviewProject(null);
-                                }}
-                                className="flex-1 py-2.5 rounded-xl bg-[#1AC13B] text-white text-xs font-bold hover:bg-[#159A2F] transition-colors cursor-pointer"
-                            >
-                                Cetak ke PDF
-                            </button>
-                            <button
-                                onClick={() => setPreviewProject(null)}
-                                className="px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
-                            >
-                                Selesai
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
         </AdminLayout>
     );
 }

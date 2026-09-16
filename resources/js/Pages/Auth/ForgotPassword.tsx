@@ -9,12 +9,12 @@ import {
     Sun,
     Moon,
     CheckCircle2,
-    AlertCircle,
     KeyRound,
     Cpu,
     BookOpen,
     Leaf,
     ShieldCheck,
+    AlertCircle,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -22,19 +22,16 @@ interface ForgotPasswordProps {
     siteConfig?: {
         center_name?: string;
     };
-    status?: string | null;
+    status?: string;
 }
 
-export default function ForgotPassword({
-    siteConfig,
-    status,
-}: ForgotPasswordProps) {
+export default function ForgotPassword({ siteConfig, status }: ForgotPasswordProps) {
     // 1. Language & Theme State
     const [language, setLanguage] = useState<Language>("EN");
     const [theme, setTheme] = useState<"light" | "dark">("light");
 
-    // 2. Inertia Form State
-    const form = useForm({
+    // 2. Form State using Inertia useForm
+    const { data, setData, post, processing, errors, reset } = useForm({
         email: "",
     });
 
@@ -46,9 +43,7 @@ export default function ForgotPassword({
         }
 
         // Load saved theme
-        const savedTheme = localStorage.getItem("stas_theme") as
-            | "light"
-            | "dark";
+        const savedTheme = localStorage.getItem("stas_theme") as "light" | "dark";
         if (savedTheme === "dark") {
             setTheme("dark");
             document.documentElement.classList.add("dark");
@@ -82,9 +77,7 @@ export default function ForgotPassword({
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        form.post("/forgot-password", {
-            preserveScroll: true,
-        });
+        post('/forgot-password');
     };
 
     const isSuccess = !!status;
@@ -166,6 +159,18 @@ export default function ForgotPassword({
                             </p>
                         </div>
 
+                        {/* Error Messages */}
+                        {Object.keys(errors).length > 0 && (
+                            <div className="mb-5 p-3.5 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900 text-xs font-semibold text-red-600 dark:text-red-400 space-y-1">
+                                {Object.entries(errors).map(([key, msg]) => (
+                                    <div key={key} className="flex items-center gap-2">
+                                        <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                                        <span>{msg}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
                         {/* Success Notification */}
                         <AnimatePresence>
                             {isSuccess && (
@@ -179,25 +184,13 @@ export default function ForgotPassword({
                                     <div>
                                         <p className="font-bold text-[#107E27] dark:text-[#3FD27B]">
                                             {language === "EN"
-                                                ? "Verification Link Dispatched"
-                                                : "Tautan Verifikasi Terkirim"}
+                                                ? "Verification Link Dispatched to Mailpit"
+                                                : "Tautan Verifikasi Terkirim ke Mailpit"}
                                         </p>
                                         <p className="mt-1 font-normal leading-relaxed text-slate-600 dark:text-slate-300">
                                             {status}
                                         </p>
                                     </div>
-                                </motion.div>
-                            )}
-
-                            {form.errors.email && (
-                                <motion.div
-                                    initial={{ opacity: 0, height: 0 }}
-                                    animate={{ opacity: 1, height: "auto" }}
-                                    exit={{ opacity: 0, height: 0 }}
-                                    className="mb-6 p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-xs font-semibold text-rose-600 dark:text-rose-400 flex items-center gap-2.5"
-                                >
-                                    <AlertCircle className="w-4 h-4 shrink-0" />
-                                    <span>{form.errors.email}</span>
                                 </motion.div>
                             )}
                         </AnimatePresence>
@@ -208,26 +201,21 @@ export default function ForgotPassword({
                                 onSubmit={handleSubmit}
                                 className="space-y-4 text-left"
                             >
-                                {/* Email Address Input */}
+                                {/* Email Address or Username Input */}
                                 <div>
                                     <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
-                                        {t.auth.emailLabel}
+                                        {t.auth.emailOrUsernameLabel}
                                     </label>
                                     <div className="relative">
                                         <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                                             <Mail className="w-4 h-4" />
                                         </div>
                                         <input
-                                            type="email"
+                                            type="text"
                                             required
-                                            value={form.data.email}
-                                            onChange={(e) =>
-                                                form.setData(
-                                                    "email",
-                                                    e.target.value,
-                                                )
-                                            }
-                                            placeholder="researcher@telkomuniversity.ac.id"
+                                            value={data.email}
+                                            onChange={(e) => setData('email', e.target.value)}
+                                            placeholder={t.auth.emailOrUsernamePlaceholder}
                                             className="w-full pl-10 pr-3.5 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs sm:text-sm font-medium text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#1AC13B] focus:ring-1 focus:ring-[#1AC13B] transition-all"
                                         />
                                     </div>
@@ -236,17 +224,13 @@ export default function ForgotPassword({
                                 {/* Main Submit Button */}
                                 <button
                                     type="submit"
-                                    disabled={
-                                        form.processing || !form.data.email.trim()
-                                    }
+                                    disabled={processing || !data.email.trim()}
                                     className="w-full mt-2 py-3.5 px-4 rounded-xl bg-[#1AC13B] hover:bg-[#159F30] text-white font-bold text-xs sm:text-sm tracking-tight transition-all duration-200 cursor-pointer disabled:opacity-50 border-0 flex items-center justify-center gap-2"
                                 >
                                     <KeyRound className="w-4 h-4" />
                                     <span>
-                                        {form.processing
-                                            ? language === "EN"
-                                                ? "Dispatching..."
-                                                : "Mengirim..."
+                                        {processing
+                                            ? (language === "EN" ? "Dispatching Email..." : "Mengirim Email...")
                                             : t.auth.forgotPasswordSendBtn}
                                     </span>
                                 </button>
@@ -264,14 +248,14 @@ export default function ForgotPassword({
                                 <button
                                     type="button"
                                     onClick={() => {
-                                        form.reset("email");
+                                        reset();
                                         window.location.reload();
                                     }}
                                     className="w-full py-3 px-4 rounded-xl bg-white dark:bg-slate-900 hover:bg-[#EDFBF1]/50 dark:hover:bg-[#10381C]/30 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-xs transition-colors cursor-pointer"
                                 >
                                     {language === "EN"
-                                        ? "Try Another Email Address"
-                                        : "Coba Alamat Email Lain"}
+                                        ? "Try Another Email / Username"
+                                        : "Coba Email / Username Lain"}
                                 </button>
                             </div>
                         )}
@@ -300,7 +284,6 @@ export default function ForgotPassword({
                         className="hidden lg:block lg:col-span-6 h-full"
                     >
                         <div className="relative w-full h-[640px] rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-[#0B132B] flex flex-col justify-between p-8 text-white group">
-                            {/* Background Artwork Layer with Subtle Overlay */}
                             <img
                                 src="/assets/images/auth_artwork.jpg"
                                 alt="STAS-RG Sustainable Technology"
@@ -308,52 +291,35 @@ export default function ForgotPassword({
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-[#0B132B] via-[#0B132B]/80 to-transparent pointer-events-none" />
 
-                            {/* Top Header Card Info */}
                             <div className="relative z-10 space-y-4">
                                 <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/10 backdrop-blur-md border border-white/15 text-xs font-bold text-[#3FD27B]">
                                     <Leaf className="w-3.5 h-3.5 text-[#1AC13B]" />
-                                    <span>
-                                        Sustainable Technology & Applied
-                                        Sciences
-                                    </span>
+                                    <span>Sustainable Technology & Applied Sciences</span>
                                 </div>
 
                                 <h2 className="text-2xl font-black text-white tracking-tight leading-snug">
-                                    Pioneering Applied Research & Industrial
-                                    Innovation
+                                    Pioneering Applied Research & Industrial Innovation
                                 </h2>
 
                                 <p className="text-xs text-slate-300 leading-relaxed max-w-md">
-                                    Integrated research laboratory ecosystem at
-                                    Telkom University bridging smart
-                                    manufacturing, renewable energy systems, and
-                                    cyber-physical operations.
+                                    Integrated research laboratory ecosystem at Telkom University bridging smart
+                                    manufacturing, renewable energy systems, and cyber-physical operations.
                                 </p>
                             </div>
 
-                            {/* Center Feature Highlights */}
                             <div className="relative z-10 grid grid-cols-2 gap-3 my-auto">
                                 <div className="p-3.5 rounded-xl bg-white/5 backdrop-blur-md border border-white/10">
                                     <Cpu className="w-4 h-4 text-[#1AC13B] mb-2" />
-                                    <div className="text-xs font-bold text-white">
-                                        8 Focus Domains
-                                    </div>
-                                    <div className="text-[11px] text-slate-400">
-                                        Industry 4.0 & Green Tech
-                                    </div>
+                                    <div className="text-xs font-bold text-white">8 Focus Domains</div>
+                                    <div className="text-[11px] text-slate-400">Industry 4.0 & Green Tech</div>
                                 </div>
                                 <div className="p-3.5 rounded-xl bg-white/5 backdrop-blur-md border border-white/10">
                                     <BookOpen className="w-4 h-4 text-[#1AC13B] mb-2" />
-                                    <div className="text-xs font-bold text-white">
-                                        50+ Publications
-                                    </div>
-                                    <div className="text-[11px] text-slate-400">
-                                        Indexed Q1 & IEEE Journals
-                                    </div>
+                                    <div className="text-xs font-bold text-white">50+ Publications</div>
+                                    <div className="text-[11px] text-slate-400">Indexed Q1 & IEEE Journals</div>
                                 </div>
                             </div>
 
-                            {/* Bottom Researcher Testimonial Box */}
                             <div className="relative z-10 backdrop-blur-xl bg-white/10 border border-white/15 p-4 rounded-xl select-none">
                                 <div className="flex items-center gap-3 mb-2">
                                     <div className="w-9 h-9 rounded-full bg-[#1AC13B] text-white font-bold flex items-center justify-center text-xs ring-2 ring-white/30 shrink-0">
@@ -378,12 +344,8 @@ export default function ForgotPassword({
                 </div>
             </main>
 
-            {/* Footer Minimal Matching Main Style */}
             <footer className="w-full py-5 px-6 border-t border-slate-100 dark:border-slate-900 bg-white dark:bg-slate-950 text-center text-xs text-slate-500 dark:text-slate-400">
-                <p>
-                    © {new Date().getFullYear()} CoE STAS-RG | Telkom
-                    University.
-                </p>
+                <p>© {new Date().getFullYear()} CoE STAS-RG | Telkom University.</p>
             </footer>
         </div>
     );

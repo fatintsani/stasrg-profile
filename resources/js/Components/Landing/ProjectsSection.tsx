@@ -13,6 +13,8 @@ interface ProjectsSectionProps {
 export const ProjectsSection: React.FC<ProjectsSectionProps> = ({ projects, t }) => {
     const [activeTabKey, setActiveTabKey] = useState<'all' | 'smartMfg' | 'sustEnergy' | 'supplyChain'>('all');
 
+    const isIndonesian = t.viewCaseStudy === 'Lihat Studi Kasus' || t.viewCaseStudy.includes('Studi');
+
     const tabs: Array<{ key: 'all' | 'smartMfg' | 'sustEnergy' | 'supplyChain'; label: string; filterCategory: string }> = [
         { key: 'all', label: t.tabs.all, filterCategory: 'All' },
         { key: 'smartMfg', label: t.tabs.smartMfg, filterCategory: 'Smart Manufacturing' },
@@ -22,7 +24,9 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({ projects, t })
 
     const currentTab = tabs.find((t) => t.key === activeTabKey) || tabs[0];
 
-    const filteredProjects = projects.filter((project) => {
+    const activeProjects = projects.filter((p) => p.is_active !== false);
+
+    const filteredProjects = activeProjects.filter((project) => {
         if (currentTab.filterCategory === 'All') return true;
         return project.category.toLowerCase().includes(currentTab.filterCategory.toLowerCase());
     });
@@ -66,63 +70,71 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({ projects, t })
                 {/* Projects Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7">
                     <AnimatePresence mode="popLayout">
-                        {filteredProjects.map((project, index) => (
-                            <motion.div
-                                key={project.id || index}
-                                layout
-                                initial={{ opacity: 0, scale: 0.96 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                exit={{ opacity: 0, scale: 0.96 }}
-                                transition={{ duration: 0.3 }}
-                                className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200/90 dark:border-slate-800 overflow-hidden flex flex-col justify-between group hover:border-[#1AC13B]/70 transition-colors"
-                            >
-                                <div>
-                                    {/* Project Image */}
-                                    <div className="relative h-48 sm:h-52 w-full overflow-hidden bg-slate-100 dark:bg-slate-800">
-                                        <img
-                                            src={project.image_url}
-                                            alt={project.title}
-                                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                                            loading="lazy"
-                                        />
-                                        {/* Category Badge overlay */}
-                                        <div className="absolute top-3 left-3">
-                                            <span className="px-2.5 py-1 rounded-md bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm text-[10px] font-extrabold uppercase tracking-wider text-[#107E27] dark:text-[#3FD27B] border border-slate-200/60 dark:border-slate-800">
-                                                {project.category_tag}
-                                            </span>
+                        {filteredProjects.map((project, index) => {
+                            const displayTitle = isIndonesian ? (project.title_id || project.title) : (project.title || project.title_id);
+                            const displaySummary = isIndonesian ? (project.summary_id || project.summary) : (project.summary || project.summary_id);
+
+                            return (
+                                <motion.div
+                                    key={project.id || index}
+                                    layout
+                                    initial={{ opacity: 0, scale: 0.96 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    exit={{ opacity: 0, scale: 0.96 }}
+                                    transition={{ duration: 0.3 }}
+                                    className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200/90 dark:border-slate-800 overflow-hidden flex flex-col justify-between group hover:border-[#1AC13B]/70 transition-colors"
+                                >
+                                    <div>
+                                        {/* Project Image */}
+                                        <div className="relative h-48 sm:h-52 w-full overflow-hidden bg-slate-100 dark:bg-slate-800">
+                                            <img
+                                                src={project.image_url}
+                                                alt={displayTitle}
+                                                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                                loading="lazy"
+                                                onError={(e) => {
+                                                    (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=800&q=80';
+                                                }}
+                                            />
+                                            {/* Category Badge overlay */}
+                                            <div className="absolute top-3 left-3">
+                                                <span className="px-2.5 py-1 rounded-md bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm text-[10px] font-extrabold uppercase tracking-wider text-[#107E27] dark:text-[#3FD27B] border border-slate-200/60 dark:border-slate-800">
+                                                    {project.category_tag}
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        {/* Content */}
+                                        <div className="p-5 sm:p-6 space-y-3">
+                                            <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white group-hover:text-[#107E27] dark:group-hover:text-[#1AC13B] transition-colors line-clamp-2 leading-snug">
+                                                {displayTitle}
+                                            </h3>
+
+                                            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 line-clamp-3 leading-relaxed">
+                                                {displaySummary}
+                                            </p>
+
+                                            {/* Researcher info */}
+                                            <div className="pt-2 flex items-center gap-2 text-xs text-slate-600 dark:text-slate-400 font-medium">
+                                                <UserCheck className="w-3.5 h-3.5 text-[#1AC13B] shrink-0" />
+                                                <span className="truncate">{project.lead_researcher}</span>
+                                            </div>
                                         </div>
                                     </div>
 
-                                    {/* Content */}
-                                    <div className="p-5 sm:p-6 space-y-3">
-                                        <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white group-hover:text-[#107E27] dark:group-hover:text-[#1AC13B] transition-colors line-clamp-2 leading-snug">
-                                            {project.title}
-                                        </h3>
-
-                                        <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 line-clamp-3 leading-relaxed">
-                                            {project.summary}
-                                        </p>
-
-                                        {/* Researcher info */}
-                                        <div className="pt-2 flex items-center gap-2 text-xs text-slate-600 dark:text-slate-400 font-medium">
-                                            <UserCheck className="w-3.5 h-3.5 text-[#1AC13B] shrink-0" />
-                                            <span className="truncate">{project.lead_researcher}</span>
-                                        </div>
+                                    {/* Footer Action */}
+                                    <div className="p-5 sm:p-6 pt-0">
+                                        <a
+                                            href={project.case_study_url || `#project-${project.slug}`}
+                                            className="inline-flex items-center gap-2 text-xs font-bold text-[#107E27] dark:text-[#1AC13B] hover:text-[#12A02E] group/link transition-colors pt-3 border-t border-slate-100 dark:border-slate-800 w-full"
+                                        >
+                                            <span>{t.viewCaseStudy}</span>
+                                            <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover/link:translate-x-1" />
+                                        </a>
                                     </div>
-                                </div>
-
-                                {/* Footer Action */}
-                                <div className="p-5 sm:p-6 pt-0">
-                                    <a
-                                        href={`#project-${project.slug}`}
-                                        className="inline-flex items-center gap-2 text-xs font-bold text-[#107E27] dark:text-[#1AC13B] hover:text-[#12A02E] group/link transition-colors pt-3 border-t border-slate-100 dark:border-slate-800 w-full"
-                                    >
-                                        <span>{t.viewCaseStudy}</span>
-                                        <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover/link:translate-x-1" />
-                                    </a>
-                                </div>
-                            </motion.div>
-                        ))}
+                                </motion.div>
+                            );
+                        })}
                     </AnimatePresence>
                 </div>
             </div>

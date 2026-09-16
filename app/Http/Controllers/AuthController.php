@@ -2,13 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\ResetPasswordMail;
 use App\Models\SiteSetting;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rules\Password;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -17,12 +22,8 @@ class AuthController extends Controller
     /**
      * Show login portal page.
      */
-    public function showLogin(Request $request): Response|RedirectResponse
+    public function showLogin(Request $request): Response
     {
-        if (Auth::check()) {
-            return redirect()->route('admin.dashboard');
-        }
-
         return Inertia::render('Auth/Login', [
             'initialTab' => 'login',
             'siteConfig' => [
@@ -33,14 +34,43 @@ class AuthController extends Controller
     }
 
     /**
-     * Show register portal page.
+     * Handle authentication login attempt.
      */
-    public function showRegister(Request $request): Response|RedirectResponse
+    public function login(Request $request): RedirectResponse
     {
-        if (Auth::check()) {
-            return redirect()->route('admin.dashboard');
+        $credentials = $request->validate([
+            'email' => ['required', 'string'],
+            'password' => ['required', 'string'],
+            'remember' => ['nullable', 'boolean'],
+        ]);
+
+        $loginInput = trim($credentials['email']);
+        $password = $credentials['password'];
+        $remember = (bool) ($credentials['remember'] ?? false);
+
+        // Allow logging in via either email or username
+        $user = User::where('email', $loginInput)
+            ->orWhere('username', $loginInput)
+            ->orWhere('name', $loginInput)
+            ->first();
+
+        if ($user && Hash::check($password, $user->password)) {
+            Auth::login($user, $remember);
+            $request->session()->regenerate();
+
+            return redirect()->intended('/admin');
         }
 
+        return back()->withErrors([
+            'email' => 'The provided credentials do not match our records.',
+        ])->onlyInput('email');
+    }
+
+    /**
+     * Show register portal page.
+     */
+    public function showRegister(Request $request): Response
+    {
         return Inertia::render('Auth/Login', [
             'initialTab' => 'register',
             'siteConfig' => [
@@ -51,69 +81,29 @@ class AuthController extends Controller
     }
 
     /**
-     * Handle user login authentication.
-     */
-    public function login(Request $request): RedirectResponse
-    {
-        $credentials = $request->validate([
-            'email' => ['required', 'string'],
-            'password' => ['required', 'string'],
-            'remember' => ['nullable', 'boolean'],
-        ]);
-
-        $emailOrUsername = $credentials['email'];
-        $password = $credentials['password'];
-        $remember = $request->boolean('remember');
-
-        // Check if user authenticated by email or name/username
-        $field = filter_var($emailOrUsername, FILTER_VALIDATE_EMAIL) ? 'email' : 'name';
-
-        if (!Auth::attempt([$field => $emailOrUsername, 'password' => $password], $remember)) {
-            throw ValidationException::withMessages([
-                'email' => __('Kredensial akun tidak cocok dengan data kami.'),
-            ]);
-        }
-
-        $request->session()->regenerate();
-
-        return redirect()->intended(route('admin.dashboard'))
-            ->with('status', 'Selamat datang kembali di Admin Portal STAS-RG.');
-    }
-
-    /**
-     * Handle user registration.
+     * Handle user account creation.
      */
     public function register(Request $request): RedirectResponse
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
+            'username' => ['required', 'string', 'max:50', 'alpha_dash', 'unique:users,username'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
             'institution' => ['nullable', 'string', 'max:255'],
             'role' => ['nullable', 'string', 'max:100'],
-        ], [
-            'name.required' => 'Nama lengkap wajib diisi.',
-            'email.required' => 'Alamat email akademik wajib diisi.',
-            'email.email' => 'Format email tidak valid.',
-            'email.unique' => 'Email ini sudah terdaftar di sistem.',
-            'password.required' => 'Kata sandi wajib diisi.',
-            'password.min' => 'Kata sandi minimal terdiri dari 8 karakter.',
-            'password.confirmed' => 'Konfirmasi kata sandi tidak cocok.',
+            'password' => ['required', 'confirmed', Password::min(8)],
         ]);
 
-        $user = User::create([
+        User::create([
             'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => $validated['password'],
-            'institution' => $validated['institution'] ?? 'CoE STAS-RG, Telkom University',
+            'username' => strtolower($validated['username']),
+            'email' => strtolower($validated['email']),
+            'institution' => $validated['institution'] ?? 'Telkom University',
             'role' => $validated['role'] ?? 'faculty_researcher',
+            'password' => Hash::make($validated['password']),
         ]);
 
-        Auth::login($user);
-        $request->session()->regenerate();
-
-        return redirect()->route('admin.dashboard')
-            ->with('status', 'Pendaftaran berhasil! Selamat datang di Portal Riset STAS-RG.');
+        return redirect()->route('login')->with('status', 'Account created successfully! Please sign in with your username or email.');
     }
 
     /**
@@ -130,40 +120,127 @@ class AuthController extends Controller
     }
 
     /**
-     * Handle forgot password recovery request.
+     * Dispatch password reset email via Mailpit.
      */
-    public function sendResetLink(Request $request): RedirectResponse
+    public function forgotPassword(Request $request): RedirectResponse
     {
         $request->validate([
-            'email' => ['required', 'email'],
-        ], [
-            'email.required' => 'Alamat email wajib diisi.',
-            'email.email' => 'Format email tidak valid.',
+            'email' => ['required', 'string'],
         ]);
 
-        $email = $request->input('email');
-        $user = User::where('email', $email)->first();
+        $input = trim($request->input('email'));
 
-        if (!$user) {
-            // Check if user exists or simulate security-safe message
-            return back()->with('status', 'Jika email terdaftar, tautan pemulihan kata sandi telah dikirimkan ke kotak masuk Anda.');
+        $user = User::where('email', $input)
+            ->orWhere('username', $input)
+            ->orWhere('name', $input)
+            ->first();
+
+        if (! $user) {
+            return back()->withErrors([
+                'email' => 'We could not find a registered researcher account with that email or username.',
+            ])->onlyInput('email');
         }
 
-        // Return status confirmation
-        return back()->with('status', "Tautan pemulihan kata sandi berhasil dikirim ke {$email}. Silakan periksa inbox email Anda.");
+        // Generate a cryptographically secure token
+        $rawToken = Str::random(64);
+
+        DB::table('password_reset_tokens')->updateOrInsert(
+            ['email' => $user->email],
+            [
+                'token' => $rawToken,
+                'created_at' => Carbon::now(),
+            ]
+        );
+
+        // Send customized HTML email via configured Mailer (Mailpit)
+        try {
+            Mail::to($user->email)->send(new ResetPasswordMail(
+                $user,
+                $rawToken,
+                $request->ip() ?? '127.0.0.1',
+                60
+            ));
+        } catch (\Throwable $e) {
+            report($e);
+            return back()->withErrors([
+                'email' => 'Failed to dispatch email: ' . $e->getMessage(),
+            ]);
+        }
+
+        return back()->with('status', 'Verification link dispatched successfully. Please check your inbox in Mailpit.');
     }
 
     /**
-     * Handle user logout.
+     * Show reset password form.
+     */
+    public function showResetPassword(Request $request, string $token): Response
+    {
+        return Inertia::render('Auth/ResetPassword', [
+            'token' => $token,
+            'email' => $request->query('email', ''),
+            'siteConfig' => [
+                'center_name' => SiteSetting::get('center_name', 'CoE STAS-RG'),
+            ],
+            'status' => session('status'),
+        ]);
+    }
+
+    /**
+     * Handle password reset submission.
+     */
+    public function resetPassword(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'token' => ['required', 'string'],
+            'email' => ['required', 'email'],
+            'password' => ['required', 'confirmed', Password::min(8)],
+        ]);
+
+        $record = DB::table('password_reset_tokens')
+            ->where('email', strtolower($request->email))
+            ->first();
+
+        if (! $record || $record->token !== $request->token) {
+            return back()->withErrors([
+                'email' => 'This password reset token is invalid.',
+            ]);
+        }
+
+        // Check 60-minute token expiration
+        if (Carbon::parse($record->created_at)->addMinutes(60)->isPast()) {
+            DB::table('password_reset_tokens')->where('email', $request->email)->delete();
+
+            return back()->withErrors([
+                'email' => 'This password reset token has expired. Please request a new one.',
+            ]);
+        }
+
+        $user = User::where('email', strtolower($request->email))->first();
+
+        if (! $user) {
+            return back()->withErrors([
+                'email' => 'We could not find an account with this email address.',
+            ]);
+        }
+
+        $user->forceFill([
+            'password' => Hash::make($request->password),
+        ])->save();
+
+        DB::table('password_reset_tokens')->where('email', $request->email)->delete();
+
+        return redirect()->route('login')->with('status', 'Your password has been successfully reset! Please sign in with your new credentials.');
+    }
+
+    /**
+     * Handle logout.
      */
     public function logout(Request $request): RedirectResponse
     {
         Auth::logout();
-
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('login')
-            ->with('status', 'Anda telah berhasil keluar dari sistem.');
+        return redirect()->route('login')->with('status', 'You have been signed out successfully.');
     }
 }

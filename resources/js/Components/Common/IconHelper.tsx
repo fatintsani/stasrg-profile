@@ -6,6 +6,7 @@ import {
     Leaf,
     Truck,
     Binary,
+    Brain,
     Recycle,
     Zap,
     UserCheck,
@@ -53,6 +54,8 @@ export const IconHelper: React.FC<IconHelperProps> = ({ name, ...props }) => {
             return <Truck {...props} />;
         case 'Binary':
             return <Binary {...props} />;
+        case 'Brain':
+            return <Brain {...props} />;
         case 'Recycle':
             return <Recycle {...props} />;
         case 'Zap':
