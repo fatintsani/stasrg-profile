@@ -1,27 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import { Search, X, Cpu, FlaskConical, FileText } from 'lucide-react';
+import { EmptyState } from './EmptyState';
 import { ResearchDomain, ResearchProject, Publication, EnterpriseService, Article } from '../../types';
 import { TranslationDictionary } from '../../utils/translations';
 
 interface SearchModalProps {
     isOpen: boolean;
     onClose: () => void;
-    domains: ResearchDomain[];
-    projects: ResearchProject[];
-    publications: Publication[];
-    services: EnterpriseService[];
-    articles: Article[];
+    domains?: ResearchDomain[];
+    projects?: ResearchProject[];
+    publications?: Publication[];
+    services?: EnterpriseService[];
+    articles?: Article[];
     t: TranslationDictionary['search'];
 }
 
 export const SearchModal: React.FC<SearchModalProps> = ({
     isOpen,
     onClose,
-    domains,
-    projects,
-    publications,
-    services,
-    articles,
+    domains = [],
+    projects = [],
+    publications = [],
+    services = [],
+    articles = [],
     t,
 }) => {
     const [query, setQuery] = useState('');
@@ -159,6 +160,15 @@ export const SearchModal: React.FC<SearchModalProps> = ({
                                     </a>
                                 ))}
                             </div>
+                        </div>
+                    )}
+
+                    {matchedDomains.length === 0 && matchedProjects.length === 0 && matchedPubs.length === 0 && (
+                        <div className="py-2">
+                            <EmptyState
+                                title={`Tidak ada data ditemukan untuk "${query}"`}
+                                description="Coba gunakan kata kunci riset lain seperti IoT, AI, sistem cerdas, atau manufaktur."
+                            />
                         </div>
                     )}
                 </div>

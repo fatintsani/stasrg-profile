@@ -9,7 +9,8 @@ export interface AlertModalProps {
     onClose: () => void;
     onConfirm?: () => void;
     title: string;
-    message: React.ReactNode;
+    message?: React.ReactNode;
+    description?: React.ReactNode;
     type?: AlertType;
     confirmText?: string;
     cancelText?: string;
@@ -24,6 +25,7 @@ export const AlertModal: React.FC<AlertModalProps> = ({
     onConfirm,
     title,
     message,
+    description,
     type = 'danger',
     confirmText,
     cancelText,
@@ -142,7 +144,7 @@ export const AlertModal: React.FC<AlertModalProps> = ({
                                 id="alert-modal-description"
                                 className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 leading-relaxed font-normal"
                             >
-                                {typeof message === 'string' ? <p>{message}</p> : message}
+                                {typeof (message || description) === 'string' ? <p>{message || description}</p> : (message || description)}
                             </div>
                         </div>
 

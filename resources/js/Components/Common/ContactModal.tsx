@@ -80,7 +80,7 @@ export const ContactModal: React.FC<ContactModalProps> = ({
                                     required
                                     value={formData.name}
                                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                    placeholder="e.g. Dr. Budi Santoso"
+                                    placeholder="Enter your full name"
                                     className="w-full text-xs sm:text-sm pl-9 pr-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 focus:outline-none focus:border-[#1AC13B] bg-slate-50/50 dark:bg-slate-800 text-slate-900 dark:text-white"
                                 />
                             </div>
@@ -95,7 +95,7 @@ export const ContactModal: React.FC<ContactModalProps> = ({
                                     required
                                     value={formData.email}
                                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                    placeholder="name@company.com"
+                                    placeholder="Enter your work email address"
                                     className="w-full text-xs sm:text-sm pl-9 pr-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 focus:outline-none focus:border-[#1AC13B] bg-slate-50/50 dark:bg-slate-800 text-slate-900 dark:text-white"
                                 />
                             </div>
@@ -110,7 +110,7 @@ export const ContactModal: React.FC<ContactModalProps> = ({
                                     required
                                     value={formData.organization}
                                     onChange={(e) => setFormData({ ...formData, organization: e.target.value })}
-                                    placeholder="e.g. PT Industri Hijau Nusantara"
+                                    placeholder="Enter your company or institution name"
                                     className="w-full text-xs sm:text-sm pl-9 pr-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 focus:outline-none focus:border-[#1AC13B] bg-slate-50/50 dark:bg-slate-800 text-slate-900 dark:text-white"
                                 />
                             </div>
@@ -139,7 +139,7 @@ export const ContactModal: React.FC<ContactModalProps> = ({
                                 required
                                 value={formData.message}
                                 onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                                placeholder="Briefly describe your objectives or research interest..."
+                                placeholder="Briefly describe your objectives, scope, or research interest..."
                                 className="w-full text-xs sm:text-sm p-3 rounded-lg border border-slate-200 dark:border-slate-700 focus:outline-none focus:border-[#1AC13B] bg-slate-50/50 dark:bg-slate-800 text-slate-900 dark:text-white resize-none"
                             />
                         </div>

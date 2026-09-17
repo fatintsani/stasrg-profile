@@ -319,7 +319,7 @@ export default function ArticlesIndex({
 
     return (
         <AdminLayout
-            title="Kelola Berita Riset & Wawasan Terkini"
+            title="Kelola Berita & Artikel"
             siteConfig={siteConfig}
         >
             <div className="space-y-6">
@@ -328,13 +328,13 @@ export default function ArticlesIndex({
                     <div className="space-y-1.5">
                         <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-[#EDFBF1] dark:bg-[#10381C] text-[#107E27] dark:text-[#3FD27B] text-xs font-bold border border-[#B2EFC3] dark:border-[#1A5C2F]">
                             <Newspaper className="w-3.5 h-3.5 text-[#1AC13B]" />
-                            <span>Media Publikasi & Wawasan Strategis</span>
+                            <span>Berita & Artikel Riset</span>
                         </div>
                         <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-                            Berita Riset & Wawasan Terkini
+                            Berita & Artikel Terkini
                         </h2>
                         <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 max-w-2xl leading-relaxed">
-                            Kelola siaran pers terobosan riset terbaru, pengumuman hibah kemitraan industri, dan laporan kebijakan strategis CoE STAS-RG.
+                            Kelola siaran pers kegiatan riset, artikel wawasan teknologi, dan pengumuman kerjasama CoE STAS-RG.
                         </p>
                     </div>
 
@@ -352,7 +352,7 @@ export default function ArticlesIndex({
                             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#1AC13B] hover:bg-[#12A02E] text-white text-xs font-bold transition-all shadow-sm cursor-pointer border-0"
                         >
                             <Plus className="w-4 h-4" />
-                            <span>Tambah Artikel Baru</span>
+                            <span>Tambah Berita Baru</span>
                         </button>
                     </div>
                 </div>
@@ -505,7 +505,14 @@ export default function ArticlesIndex({
                 {/* 4. Articles Content (Grid or Table) */}
                 {articles.length === 0 ? (
                     <div className="p-12 text-center rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
-                        <Newspaper className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
+                        <img
+                            src="/assets/icon/errors/notfound.png"
+                            alt="Tidak ada data"
+                            className="w-28 sm:w-36 h-auto object-contain mx-auto select-none pointer-events-none drop-shadow-xs mb-3"
+                            onError={(e) => {
+                                (e.target as HTMLImageElement).src = '/assets/icon/errors/notfound.png';
+                            }}
+                        />
                         <h3 className="text-base font-bold text-slate-800 dark:text-slate-200">
                             Tidak ada artikel berita ditemukan
                         </h3>
@@ -879,7 +886,7 @@ export default function ArticlesIndex({
                                                         type="text"
                                                         value={form.data.title_id}
                                                         onChange={(e) => form.setData('title_id', e.target.value)}
-                                                        placeholder="Contoh: STAS-RG dan PT PINDAD Luncurkan Optimasi Logistik Armada Otonom Cerdas"
+                                                        placeholder="Masukkan judul artikel berita..."
                                                         className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#1AC13B]"
                                                     />
                                                 </div>
@@ -892,7 +899,7 @@ export default function ArticlesIndex({
                                                         type="text"
                                                         value={form.data.title}
                                                         onChange={(e) => form.setData('title', e.target.value)}
-                                                        placeholder="Example: STAS-RG and PT PINDAD Launch Autonomous Fleet Logistics Optimization"
+                                                        placeholder="Enter news article title in English..."
                                                         className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#1AC13B]"
                                                     />
                                                 </div>
@@ -926,7 +933,7 @@ export default function ArticlesIndex({
                                                     type="text"
                                                     value={form.data.date}
                                                     onChange={(e) => form.setData('date', e.target.value)}
-                                                    placeholder="Contoh: NOV 24 - 2026 atau 15 OKT 2026"
+                                                    placeholder="Masukkan format tanggal publikasi..."
                                                     className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#1AC13B]"
                                                 />
                                             </div>
@@ -942,7 +949,7 @@ export default function ArticlesIndex({
                                                     type="text"
                                                     value={form.data.author}
                                                     onChange={(e) => form.setData('author', e.target.value)}
-                                                    placeholder="Contoh: Dr. Ir. Hendra S. & Tim Editorial STAS"
+                                                    placeholder="Masukkan nama penulis atau tim editorial..."
                                                     className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#1AC13B]"
                                                 />
                                             </div>
@@ -955,7 +962,7 @@ export default function ArticlesIndex({
                                                     type="text"
                                                     value={form.data.read_time}
                                                     onChange={(e) => form.setData('read_time', e.target.value)}
-                                                    placeholder="Contoh: 4 min read atau 5 menit baca"
+                                                    placeholder="Masukkan estimasi waktu baca..."
                                                     className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#1AC13B]"
                                                 />
                                             </div>

@@ -2,7 +2,15 @@ export interface ResearchMetric {
     id: number;
     value: string;
     label: string;
+    label_id?: string;
     description: string;
+    description_id?: string;
+    icon?: string;
+    source_type?: string;
+    order?: number;
+    is_active?: boolean;
+    created_at?: string;
+    updated_at?: string;
 }
 
 export interface AboutHighlight {
@@ -167,6 +175,35 @@ export interface UpcomingEvent {
     updated_at?: string;
 }
 
+export interface Researcher {
+    id: number;
+    name: string;
+    title_degree?: string;
+    role: string;
+    role_id?: string;
+    specialization: string;
+    specialization_id?: string;
+    department?: string;
+    institution?: string;
+    email?: string;
+    phone?: string;
+    bio?: string;
+    bio_id?: string;
+    avatar_url?: string;
+    scholar_url?: string;
+    scopus_id?: string;
+    orcid?: string;
+    linkedin_url?: string;
+    focus_areas?: string[];
+    publications_count?: number;
+    projects_count?: number;
+    is_featured?: boolean;
+    is_active?: boolean;
+    order?: number;
+    created_at?: string;
+    updated_at?: string;
+}
+
 export interface SiteConfig {
     center_name: string;
     tagline: string;
@@ -178,11 +215,14 @@ export interface SiteConfig {
     contact_email: string;
     contact_phone: string;
     address: string;
+    maps_url?: string;
+    university_url?: string;
     social_links: {
         linkedin?: string;
         github?: string;
         youtube?: string;
         twitter?: string;
+        instagram?: string;
     };
 }
 
@@ -198,3 +238,23 @@ export interface HomePageProps {
     events: UpcomingEvent[];
     siteConfig: SiteConfig;
 }
+
+export interface Inquiry {
+    id: number;
+    name: string;
+    email: string;
+    phone?: string | null;
+    organization?: string | null;
+    category: 'collaboration' | 'research' | 'enterprise' | 'academic' | 'general';
+    subject: string;
+    message: string;
+    status: 'unread' | 'in_progress' | 'resolved' | 'archived';
+    priority: 'normal' | 'high' | 'urgent';
+    admin_notes?: string | null;
+    replied_at?: string | null;
+    ip_address?: string | null;
+    user_agent?: string | null;
+    created_at: string;
+    updated_at?: string;
+}
+

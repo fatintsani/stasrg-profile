@@ -35,11 +35,17 @@ export const CtaBanner: React.FC<CtaBannerProps> = ({
                     <div className="absolute -right-20 -bottom-20 w-80 h-80 rounded-full bg-[#1AC13B]/5 dark:bg-[#1AC13B]/10 pointer-events-none" />
 
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-                        {/* Left Content */}
                         <div className="lg:col-span-7 space-y-5">
-                            <PillBadge variant="green" showDot>
-                                {t.pill}
-                            </PillBadge>
+                            <div className="flex items-center gap-3">
+                                <img
+                                    src="/assets/icon/profile_cs.png"
+                                    alt="Collaboration Support"
+                                    className="w-14 h-14 sm:w-16 sm:h-16 object-contain drop-shadow-md"
+                                />
+                                <PillBadge variant="green" showDot>
+                                    {t.pill}
+                                </PillBadge>
+                            </div>
 
                             <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-tight">
                                 {t.titlePart1} <br className="hidden sm:inline" />

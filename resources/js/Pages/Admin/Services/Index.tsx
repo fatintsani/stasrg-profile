@@ -227,7 +227,7 @@ export default function ServicesIndex({
 
     return (
         <AdminLayout
-            title={isEn ? 'Enterprise Services' : 'Kelola Layanan Industri'}
+            title={isEn ? 'Services & Consulting' : 'Kelola Layanan & Konsultasi'}
             siteConfig={siteConfig}
         >
             <div className="space-y-6">
@@ -236,15 +236,15 @@ export default function ServicesIndex({
                     <div className="space-y-1.5">
                         <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-[#EDFBF1] dark:bg-[#10381C] text-[#107E27] dark:text-[#3FD27B] text-xs font-bold">
                             <FlaskConical className="w-3.5 h-3.5" />
-                            <span>{isEn ? 'Production-Ready Advisory & Testing' : 'Layanan Rekayasa & Konsultansi Siap Produksi'}</span>
+                            <span>{isEn ? 'Services & Consulting' : 'Layanan & Konsultasi'}</span>
                         </div>
                         <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-                            {isEn ? 'Enterprise & Industrial Advisory' : 'Layanan Kerjasama Industri'}
+                            {isEn ? 'Industrial Research & Consulting Services' : 'Layanan Riset & Konsultasi Industri'}
                         </h2>
                         <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 max-w-2xl leading-relaxed">
                             {isEn
-                                ? 'Configure specialized consultancy tracks, custom industrial R&D, certified lab testing, ESG audits, and technology commercialization at CoE STAS-RG.'
-                                : 'Kelola portofolio layanan konsultansi, riset kustom R&D, pengujian laboratorium, audit ESG, dan komersialisasi teknologi di CoE STAS-RG.'}
+                                ? 'Manage industrial consulting solutions, lab testing packages, and technology scale-up services at CoE STAS-RG.'
+                                : 'Kelola paket layanan konsultasi industri, pengujian laboratorium, dan solusi teknologi terapan di CoE STAS-RG.'}
                         </p>
                     </div>
 
@@ -366,139 +366,169 @@ export default function ServicesIndex({
                     </div>
                 </div>
 
-                {/* 4. Services Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                    {services.map((service, index) => (
-                        <motion.div
-                            key={service.id}
-                            layout
-                            initial={{ opacity: 0, y: 15 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.2, delay: index * 0.04 }}
-                            className={`p-6 rounded-2xl bg-white dark:bg-slate-900 border transition-all flex flex-col justify-between group ${
-                                service.is_active
-                                    ? 'border-slate-200 dark:border-slate-800 hover:border-[#1AC13B]/70'
-                                    : 'border-slate-200/50 dark:border-slate-800/50 opacity-60 bg-slate-50/50 dark:bg-slate-900/40'
-                            }`}
-                        >
-                            <div className="space-y-4">
-                                {/* Top Badges: Service Number & Icon */}
-                                <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-2.5">
-                                        <div className="w-10 h-10 rounded-xl bg-[#EDFBF1] dark:bg-[#10381C] text-[#107E27] dark:text-[#3FD27B] flex items-center justify-center font-black text-sm group-hover:bg-[#1AC13B] group-hover:text-white transition-colors shrink-0">
-                                            {service.service_number}
+                {/* 4. Services Grid or Empty State */}
+                {services.length === 0 ? (
+                    <div className="p-12 text-center rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-3">
+                        <img
+                            src="/assets/icon/errors/notfound.png"
+                            alt="Tidak ada data"
+                            className="w-28 sm:w-36 h-auto object-contain mx-auto select-none pointer-events-none drop-shadow-xs mb-2"
+                            onError={(e) => {
+                                (e.target as HTMLImageElement).src = '/assets/icon/errors/notfound.png';
+                            }}
+                        />
+                        <h3 className="text-base font-bold text-slate-800 dark:text-slate-200">
+                            {isEn ? 'No research services found' : 'Tidak ada layanan riset ditemukan'}
+                        </h3>
+                        <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                            {isEn
+                                ? 'Try changing your search keywords or status filter, or register a new research consulting service.'
+                                : 'Coba ubah kata kunci pencarian atau filter status, atau tambahkan layanan konsultasi riset baru.'}
+                        </p>
+                        <div>
+                            <button
+                                onClick={openCreateModal}
+                                className="mt-2 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#1AC13B] hover:bg-[#12A02E] text-white text-xs font-bold transition-colors cursor-pointer border-0"
+                            >
+                                <Plus className="w-4 h-4" />
+                                <span>{isEn ? 'Add Research Service' : 'Tambah Layanan Baru'}</span>
+                            </button>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                        {services.map((service, index) => (
+                            <motion.div
+                                key={service.id}
+                                layout
+                                initial={{ opacity: 0, y: 15 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.2, delay: index * 0.04 }}
+                                className={`p-6 rounded-2xl bg-white dark:bg-slate-900 border transition-all flex flex-col justify-between group ${
+                                    service.is_active
+                                        ? 'border-slate-200 dark:border-slate-800 hover:border-[#1AC13B]/70'
+                                        : 'border-slate-200/50 dark:border-slate-800/50 opacity-60 bg-slate-50/50 dark:bg-slate-900/40'
+                                }`}
+                            >
+                                <div className="space-y-4">
+                                    {/* Top Badges: Service Number & Icon */}
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center gap-2.5">
+                                            <div className="w-10 h-10 rounded-xl bg-[#EDFBF1] dark:bg-[#10381C] text-[#107E27] dark:text-[#3FD27B] flex items-center justify-center font-black text-sm group-hover:bg-[#1AC13B] group-hover:text-white transition-colors shrink-0">
+                                                {service.service_number}
+                                            </div>
+                                            <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center">
+                                                <IconHelper name={service.icon} className="w-4 h-4" />
+                                            </div>
                                         </div>
-                                        <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center">
-                                            <IconHelper name={service.icon} className="w-4 h-4" />
+
+                                        {/* Quick Status switches */}
+                                        <div className="flex items-center gap-1">
+                                            <button
+                                                type="button"
+                                                onClick={() => handleToggleFeatured(service)}
+                                                title={service.is_featured ? 'Featured Service' : 'Mark as Featured'}
+                                                className={`p-1.5 rounded-lg transition-colors cursor-pointer border-0 ${
+                                                    service.is_featured
+                                                        ? 'bg-amber-100 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400'
+                                                        : 'bg-slate-100 dark:bg-slate-800 text-slate-400'
+                                                }`}
+                                            >
+                                                <Star className={`w-3.5 h-3.5 ${service.is_featured ? 'fill-current' : ''}`} />
+                                            </button>
+
+                                            <button
+                                                type="button"
+                                                onClick={() => handleToggleStatus(service)}
+                                                title={service.is_active ? 'Published' : 'Draft'}
+                                                className={`px-2 py-1 rounded-lg text-[10px] font-bold transition-colors cursor-pointer border-0 ${
+                                                    service.is_active
+                                                        ? 'bg-[#EDFBF1] dark:bg-[#10381C] text-[#107E27] dark:text-[#3FD27B]'
+                                                        : 'bg-slate-100 dark:bg-slate-800 text-slate-400'
+                                                }`}
+                                            >
+                                                {service.is_active ? (isEn ? 'Live' : 'Aktif') : 'Draft'}
+                                            </button>
                                         </div>
                                     </div>
 
-                                    {/* Quick Status switches */}
+                                    {/* Title (Bilingual) */}
+                                    <div className="space-y-1">
+                                        <h3 className="text-base font-bold text-slate-900 dark:text-white group-hover:text-[#107E27] dark:group-hover:text-[#1AC13B] transition-colors leading-snug">
+                                            {service.title_id || service.title}
+                                        </h3>
+                                        {service.title_id && service.title !== service.title_id && (
+                                            <div className="text-[11px] text-slate-400 dark:text-slate-500 italic">
+                                                EN: {service.title}
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Summary */}
+                                    <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-3 leading-relaxed">
+                                        {service.summary_id || service.summary}
+                                    </p>
+
+                                    {/* Deliverables / Features Tags */}
+                                    {service.features && service.features.length > 0 && (
+                                        <div className="flex flex-wrap gap-1 pt-1">
+                                            {service.features.map((feat, fIdx) => (
+                                                <span
+                                                    key={fIdx}
+                                                    className="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-[10px] font-medium text-slate-600 dark:text-slate-300"
+                                                >
+                                                    {feat}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    )}
+
+                                    {/* Metadata: Target Industry & Advisor */}
+                                    <div className="space-y-1.5 pt-2 border-t border-slate-100 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400">
+                                        {service.target_industry && (
+                                            <div className="flex items-center gap-1.5">
+                                                <Building2 className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                                                <span className="truncate">{service.target_industry}</span>
+                                            </div>
+                                        )}
+                                        {service.lead_advisor && (
+                                            <div className="flex items-center gap-1.5">
+                                                <UserCheck className="w-3.5 h-3.5 text-[#107E27] dark:text-[#1AC13B] shrink-0" />
+                                                <span className="truncate">{service.lead_advisor}</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Bottom Card Actions */}
+                                <div className="pt-4 mt-4 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
+                                    <span className="text-[11px] font-bold text-[#107E27] dark:text-[#1AC13B]">
+                                        {service.action_label_id || service.action_label || 'Pelajari Layanan'}
+                                    </span>
+
                                     <div className="flex items-center gap-1">
                                         <button
                                             type="button"
-                                            onClick={() => handleToggleFeatured(service)}
-                                            title={service.is_featured ? 'Featured Service' : 'Mark as Featured'}
-                                            className={`p-1.5 rounded-lg transition-colors cursor-pointer border-0 ${
-                                                service.is_featured
-                                                    ? 'bg-amber-100 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400'
-                                                    : 'bg-slate-100 dark:bg-slate-800 text-slate-400'
-                                            }`}
+                                            onClick={() => openEditModal(service)}
+                                            className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer border-0"
+                                            title={isEn ? 'Edit Service' : 'Ubah Layanan'}
                                         >
-                                            <Star className={`w-3.5 h-3.5 ${service.is_featured ? 'fill-current' : ''}`} />
+                                            <Edit3 className="w-3.5 h-3.5" />
                                         </button>
-
                                         <button
                                             type="button"
-                                            onClick={() => handleToggleStatus(service)}
-                                            title={service.is_active ? 'Published' : 'Draft'}
-                                            className={`px-2 py-1 rounded-lg text-[10px] font-bold transition-colors cursor-pointer border-0 ${
-                                                service.is_active
-                                                    ? 'bg-[#EDFBF1] dark:bg-[#10381C] text-[#107E27] dark:text-[#3FD27B]'
-                                                    : 'bg-slate-100 dark:bg-slate-800 text-slate-400'
-                                            }`}
+                                            onClick={() => setServiceToDelete(service)}
+                                            className="p-1.5 rounded-lg text-red-500 hover:text-red-700 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors cursor-pointer border-0"
+                                            title={isEn ? 'Delete Service' : 'Hapus Layanan'}
                                         >
-                                            {service.is_active ? (isEn ? 'Live' : 'Aktif') : 'Draft'}
+                                            <Trash2 className="w-3.5 h-3.5" />
                                         </button>
                                     </div>
                                 </div>
-
-                                {/* Title (Bilingual) */}
-                                <div className="space-y-1">
-                                    <h3 className="text-base font-bold text-slate-900 dark:text-white group-hover:text-[#107E27] dark:group-hover:text-[#1AC13B] transition-colors leading-snug">
-                                        {service.title_id || service.title}
-                                    </h3>
-                                    {service.title_id && service.title !== service.title_id && (
-                                        <div className="text-[11px] text-slate-400 dark:text-slate-500 italic">
-                                            EN: {service.title}
-                                        </div>
-                                    )}
-                                </div>
-
-                                {/* Summary */}
-                                <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-3 leading-relaxed">
-                                    {service.summary_id || service.summary}
-                                </p>
-
-                                {/* Deliverables / Features Tags */}
-                                {service.features && service.features.length > 0 && (
-                                    <div className="flex flex-wrap gap-1 pt-1">
-                                        {service.features.map((feat, fIdx) => (
-                                            <span
-                                                key={fIdx}
-                                                className="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-[10px] font-medium text-slate-600 dark:text-slate-300"
-                                            >
-                                                {feat}
-                                            </span>
-                                        ))}
-                                    </div>
-                                )}
-
-                                {/* Metadata: Target Industry & Advisor */}
-                                <div className="space-y-1.5 pt-2 border-t border-slate-100 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400">
-                                    {service.target_industry && (
-                                        <div className="flex items-center gap-1.5">
-                                            <Building2 className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                                            <span className="truncate">{service.target_industry}</span>
-                                        </div>
-                                    )}
-                                    {service.lead_advisor && (
-                                        <div className="flex items-center gap-1.5">
-                                            <UserCheck className="w-3.5 h-3.5 text-[#107E27] dark:text-[#1AC13B] shrink-0" />
-                                            <span className="truncate">{service.lead_advisor}</span>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-
-                            {/* Bottom Card Actions */}
-                            <div className="pt-4 mt-4 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
-                                <span className="text-[11px] font-bold text-[#107E27] dark:text-[#1AC13B]">
-                                    {service.action_label_id || service.action_label || 'Pelajari Layanan'}
-                                </span>
-
-                                <div className="flex items-center gap-1">
-                                    <button
-                                        type="button"
-                                        onClick={() => openEditModal(service)}
-                                        className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer border-0"
-                                        title={isEn ? 'Edit Service' : 'Ubah Layanan'}
-                                    >
-                                        <Edit3 className="w-3.5 h-3.5" />
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => setServiceToDelete(service)}
-                                        className="p-1.5 rounded-lg text-red-500 hover:text-red-700 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors cursor-pointer border-0"
-                                        title={isEn ? 'Delete Service' : 'Hapus Layanan'}
-                                    >
-                                        <Trash2 className="w-3.5 h-3.5" />
-                                    </button>
-                                </div>
-                            </div>
-                        </motion.div>
-                    ))}
-                </div>
+                            </motion.div>
+                        ))}
+                    </div>
+                )}
 
                 {/* 5. Create / Edit Service Modal Dialog */}
                 <AnimatePresence>
@@ -663,7 +693,7 @@ export default function ServicesIndex({
                                                         required
                                                         value={form.data.title_id}
                                                         onChange={(e) => form.setData('title_id', e.target.value)}
-                                                        placeholder="contoh: R&D Industri Kustom, Konsultasi Rantai Pasok"
+                                                        placeholder="Masukkan judul layanan riset industri..."
                                                         className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-900 dark:text-white focus:outline-none focus:border-[#1AC13B]"
                                                     />
                                                 </div>
@@ -677,7 +707,7 @@ export default function ServicesIndex({
                                                         required
                                                         value={form.data.summary_id}
                                                         onChange={(e) => form.setData('summary_id', e.target.value)}
-                                                        placeholder="contoh: Riset rekayasa khusus, pengembangan prototipe, dan validasi teknis untuk tantangan manufaktur yang kompleks."
+                                                        placeholder="Masukkan deskripsi cakupan dan lingkup layanan riset..."
                                                         className="w-full px-3.5 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#1AC13B]"
                                                     />
                                                 </div>
@@ -707,7 +737,7 @@ export default function ServicesIndex({
                                                         required
                                                         value={form.data.title}
                                                         onChange={(e) => form.setData('title', e.target.value)}
-                                                        placeholder="e.g. Custom Industrial R&D, Supply Chain Advisory"
+                                                        placeholder="Enter service track title in English..."
                                                         className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-900 dark:text-white focus:outline-none focus:border-[#1AC13B]"
                                                     />
                                                 </div>
@@ -721,7 +751,7 @@ export default function ServicesIndex({
                                                         required
                                                         value={form.data.summary}
                                                         onChange={(e) => form.setData('summary', e.target.value)}
-                                                        placeholder="e.g. Tailored engineering research, prototype development, and technical validation for complex manufacturing challenges."
+                                                        placeholder="Enter service scope and summary in English..."
                                                         className="w-full px-3.5 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#1AC13B]"
                                                     />
                                                 </div>
@@ -753,7 +783,7 @@ export default function ServicesIndex({
                                                 value={newFeatureInput}
                                                 onChange={(e) => setNewFeatureInput(e.target.value)}
                                                 onKeyDown={handleAddFeature}
-                                                placeholder={isEn ? 'Type deliverable (e.g. Rapid Prototyping) and press Add' : 'Ketik deliverable (contoh: Uji Stres Material) lalu tekan Tambah'}
+                                                placeholder={isEn ? 'Enter deliverable and press Add' : 'Masukkan deliverable lalu tekan Tambah'}
                                                 className="flex-1 px-3.5 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#1AC13B]"
                                             />
                                             <button
@@ -800,7 +830,7 @@ export default function ServicesIndex({
                                                 type="text"
                                                 value={form.data.target_industry}
                                                 onChange={(e) => form.setData('target_industry', e.target.value)}
-                                                placeholder="e.g. Automotive & Heavy Manufacturing"
+                                                placeholder={isEn ? 'Enter target industry sector...' : 'Masukkan sektor target industri...'}
                                                 className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#1AC13B]"
                                             />
                                         </div>
@@ -813,7 +843,7 @@ export default function ServicesIndex({
                                                 type="text"
                                                 value={form.data.lead_advisor}
                                                 onChange={(e) => form.setData('lead_advisor', e.target.value)}
-                                                placeholder="e.g. Dr. Ir. Hendra S."
+                                                placeholder={isEn ? 'Enter lead advisor or coordinator name...' : 'Masukkan nama konsultan penanggung jawab...'}
                                                 className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#1AC13B]"
                                             />
                                         </div>

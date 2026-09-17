@@ -6,6 +6,7 @@ import { ResearchDomain } from '../../types';
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { TranslationDictionary } from '../../utils/translations';
+import { EmptyState } from '../Common/EmptyState';
 
 interface DomainsSectionProps {
     domains: ResearchDomain[];
@@ -13,6 +14,9 @@ interface DomainsSectionProps {
 }
 
 export const DomainsSection: React.FC<DomainsSectionProps> = ({ domains, t }) => {
+    const isIndonesian = t.exploreLink === 'Pelajari Domain' || t.exploreLink.includes('Pelajari');
+    const activeDomains = (domains || []).filter((d) => d.is_active !== false);
+
     return (
         <section id="domains" className="py-20 md:py-28 bg-[#FBFDFB] dark:bg-slate-900/50 border-b border-slate-100 dark:border-slate-800 transition-colors">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -23,15 +27,13 @@ export const DomainsSection: React.FC<DomainsSectionProps> = ({ domains, t }) =>
                     align="between"
                     actionLink={{
                         text: t.actionLink,
-                        href: '#domains',
+                        href: '/research',
                     }}
                 />
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-                    {domains
-                        .filter((d) => d.is_active !== false)
-                        .map((domain, index) => {
-                            const isIndonesian = t.exploreLink === 'Pelajari Domain' || t.exploreLink.includes('Pelajari');
+                {activeDomains.length > 0 ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                        {activeDomains.map((domain, index) => {
                             const displayTitle = isIndonesian ? (domain.title_id || domain.title) : (domain.title || domain.title_id);
                             const displaySummary = isIndonesian ? (domain.summary_id || domain.summary) : (domain.summary || domain.summary_id);
 
@@ -66,17 +68,23 @@ export const DomainsSection: React.FC<DomainsSectionProps> = ({ domains, t }) =>
                                             </p>
                                         </div>
 
-                                    <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                                        <span className="text-xs font-bold text-[#107E27] dark:text-[#1AC13B] group-hover:text-[#12A02E] inline-flex items-center gap-1.5 transition-colors">
-                                            {t.exploreLink}
-                                            <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
-                                        </span>
-                                    </div>
-                                </Card>
-                            </motion.div>
-                        );
-                    })}
-                </div>
+                                        <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                                            <span className="text-xs font-bold text-[#107E27] dark:text-[#1AC13B] group-hover:text-[#12A02E] inline-flex items-center gap-1.5 transition-colors">
+                                                {t.exploreLink}
+                                                <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
+                                            </span>
+                                        </div>
+                                    </Card>
+                                </motion.div>
+                            );
+                        })}
+                    </div>
+                ) : (
+                    <EmptyState
+                        title={isIndonesian ? 'Tidak ada data domain riset ditemukan' : 'No research domains found'}
+                        description={isIndonesian ? 'Data fokus bidang riset belum tersedia di database.' : 'Research focus areas are not available in the database.'}
+                    />
+                )}
             </div>
         </section>
     );

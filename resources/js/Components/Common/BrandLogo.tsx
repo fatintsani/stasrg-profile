@@ -28,9 +28,9 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
     };
 
     const subSizes = {
-        sm: 'text-[9px]',
-        md: 'text-[10px] sm:text-[10.5px]',
-        lg: 'text-xs',
+        sm: 'text-[7.5px]',
+        md: 'text-[8.5px] sm:text-[9px]',
+        lg: 'text-[10px] sm:text-[10.5px]',
     };
 
     const textColor = isDark ? 'text-slate-900 dark:text-white' : 'text-white';
@@ -51,7 +51,7 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
             </div>
 
             <div className="flex flex-col justify-center">
-                <div className={`flex items-baseline gap-1.5 leading-tight ${textColor} ${textSizes[size]}`}>
+                <div className={`flex items-baseline gap-1 leading-tight ${textColor} ${textSizes[size]}`}>
                     <span className="font-extrabold tracking-tight">STAS</span>
                     <span className="font-normal tracking-tight opacity-90">
                         Research Group

@@ -32,7 +32,6 @@ export const SectionHeading: React.FC<SectionHeadingProps> = ({
                     {pillText && (
                         <div className="mb-2.5">
                             <span className="inline-flex items-center gap-1.5 text-xs font-bold text-[#107E27] dark:text-[#1AC13B] tracking-wider uppercase select-none">
-                                <span className="w-1.5 h-1.5 rounded-full bg-[#1AC13B] shrink-0" />
                                 {pillText}
                             </span>
                         </div>

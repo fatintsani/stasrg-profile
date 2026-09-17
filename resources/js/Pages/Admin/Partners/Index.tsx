@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import AdminLayout from '../../../Layouts/AdminLayout';
 import { Partner, SiteConfig } from '../../../types';
-import { useForm, router } from '@inertiajs/react';
+import { useForm, router, Link } from '@inertiajs/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Building2,
@@ -272,32 +272,38 @@ export default function PartnersIndex({
     };
 
     return (
-        <AdminLayout title="Mitra Industri & Lembaga" siteConfig={siteConfig}>
-            {/* Header Banner */}
-            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-emerald-950 via-slate-900 to-slate-950 p-6 sm:p-8 text-white border border-emerald-900/30">
-                <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-                    <div>
-                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#1AC13B]/20 text-[#3FD27B] text-xs font-bold uppercase tracking-wider mb-3 border border-[#1AC13B]/30">
-                            <Handshake className="w-3.5 h-3.5" />
-                            Kolaborasi & Industri
-                        </div>
-                        <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-                            Mitra Industri & Lembaga Pemerintah
-                        </h1>
-                        <p className="mt-1 text-xs sm:text-sm text-slate-300 max-w-2xl leading-relaxed">
-                            Kelola relasi strategis bersama BUMN, industri manufaktur, perguruan tinggi, startup teknologi, dan lembaga pemerintah yang mempercayai CoE STAS-RG.
-                        </p>
+        <AdminLayout title="Kelola Mitra Kerjasama" siteConfig={siteConfig}>
+            {/* 1. Header Banner */}
+            <div className="p-6 md:p-8 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div className="space-y-1.5">
+                    <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-[#EDFBF1] dark:bg-[#10381C] text-[#107E27] dark:text-[#3FD27B] text-xs font-bold border border-[#B2EFC3] dark:border-[#1A5C2F]">
+                        <Building2 className="w-3.5 h-3.5 text-[#1AC13B]" />
+                        <span>Mitra & Jaringan Kerjasama</span>
                     </div>
+                    <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+                        Mitra Kerjasama & Kolaborasi Industri
+                    </h2>
+                    <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 max-w-2xl leading-relaxed">
+                        Kelola data mitra industri, universitas rekanan, dan lembaga riset yang berkolaborasi dengan CoE STAS-RG.
+                    </p>
+                </div>
 
-                    <div className="flex items-center gap-3 shrink-0">
-                        <button
-                            onClick={openCreateModal}
-                            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#1AC13B] hover:bg-[#12A02E] text-white font-bold text-xs shadow-none transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
-                        >
-                            <Plus className="w-4 h-4" />
-                            <span>Tambah Mitra Baru</span>
-                        </button>
-                    </div>
+                <div className="flex items-center gap-3 shrink-0">
+                    <Link
+                        href="/#partners"
+                        target="_blank"
+                        className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-bold text-slate-800 dark:text-slate-200 hover:text-[#107E27] dark:hover:text-[#1AC13B] transition-colors shadow-xs"
+                    >
+                        <ExternalLink className="w-4 h-4 text-[#1AC13B]" />
+                        <span>Lihat di Beranda</span>
+                    </Link>
+                    <button
+                        onClick={openCreateModal}
+                        className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#1AC13B] hover:bg-[#12A02E] text-white font-bold text-xs shadow-xs transition-all cursor-pointer border-0"
+                    >
+                        <Plus className="w-4 h-4" />
+                        <span>Tambah Mitra Baru</span>
+                    </button>
                 </div>
             </div>
 
@@ -425,162 +431,170 @@ export default function PartnersIndex({
                 </div>
             </div>
 
-            {/* Partners Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                {partners.map((partner) => (
-                    <motion.div
-                        key={partner.id}
-                        layout
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className={`rounded-xl bg-white dark:bg-slate-900 border p-5 flex flex-col justify-between transition-all duration-200 hover:border-[#1AC13B]/60 ${
-                            partner.is_active === false
-                                ? 'border-dashed border-slate-300 dark:border-slate-800 opacity-60'
-                                : partner.is_featured
-                                ? 'border-[#1AC13B]/40 dark:border-[#1AC13B]/30'
-                                : 'border-slate-200/90 dark:border-slate-800'
-                        }`}
-                    >
-                        <div>
-                            {/* Top Card Bar: Category, Status & Action Toggles */}
-                            <div className="flex items-center justify-between mb-4">
-                                {getCategoryBadge(partner.category)}
-
-                                <div className="flex items-center gap-1">
-                                    {/* Featured Toggle */}
-                                    <button
-                                        onClick={() => handleToggleFeatured(partner)}
-                                        title={partner.is_featured ? 'Hapus dari Mitra Utama' : 'Jadikan Mitra Utama'}
-                                        className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
-                                            partner.is_featured
-                                                ? 'text-amber-500 bg-amber-50 dark:bg-amber-950/40'
-                                                : 'text-slate-300 hover:text-slate-500 dark:hover:text-slate-300'
-                                        }`}
-                                    >
-                                        <Star className="w-3.5 h-3.5 fill-current" />
-                                    </button>
-
-                                    {/* Active Status Toggle */}
-                                    <button
-                                        onClick={() => handleToggleStatus(partner)}
-                                        title={partner.is_active ? 'Klik untuk nonaktifkan' : 'Klik untuk aktifkan'}
-                                        className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
-                                            partner.is_active
-                                                ? 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40'
-                                                : 'text-slate-400 bg-slate-100 dark:bg-slate-800'
-                                        }`}
-                                    >
-                                        {partner.is_active ? (
-                                            <CheckCircle2 className="w-3.5 h-3.5" />
-                                        ) : (
-                                            <XCircle className="w-3.5 h-3.5" />
-                                        )}
-                                    </button>
-                                </div>
-                            </div>
-
-                            {/* Logo Presentation Box */}
-                            <div className="h-20 w-full rounded-lg bg-slate-50 dark:bg-slate-800/80 border border-slate-100 dark:border-slate-800 flex items-center justify-center p-3 mb-4 group overflow-hidden">
-                                {partner.logo_url ? (
-                                    <img
-                                        src={partner.logo_url}
-                                        alt={partner.name}
-                                        className="max-h-12 max-w-[160px] object-contain transition-transform group-hover:scale-105 dark:brightness-0 dark:invert dark:opacity-90"
-                                        onError={(e) => {
-                                            (e.target as HTMLImageElement).style.display = 'none';
-                                        }}
-                                    />
-                                ) : (
-                                    <span className="text-xs font-black tracking-wider uppercase text-slate-700 dark:text-slate-300 text-center">
-                                        {partner.logo_text || partner.name}
-                                    </span>
-                                )}
-                            </div>
-
-                            {/* Partner Info */}
+            {/* Partners Grid or Empty State */}
+            {partners.length === 0 ? (
+                <div className="p-12 text-center rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-3">
+                    <img
+                        src="/assets/icon/errors/notfound.png"
+                        alt="Tidak ada data"
+                        className="w-28 sm:w-36 h-auto object-contain mx-auto select-none pointer-events-none drop-shadow-xs mb-2"
+                        onError={(e) => {
+                            (e.target as HTMLImageElement).src = '/assets/icon/errors/notfound.png';
+                        }}
+                    />
+                    <h3 className="text-base font-bold text-slate-800 dark:text-slate-200">
+                        Tidak ada mitra kerjasama ditemukan
+                    </h3>
+                    <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                        Coba ubah kata kunci pencarian atau filter kategori, atau tambahkan mitra kerjasama baru.
+                    </p>
+                    <div>
+                        <button
+                            onClick={openCreateModal}
+                            className="mt-2 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#1AC13B] hover:bg-[#12A02E] text-white text-xs font-bold transition-colors cursor-pointer border-0"
+                        >
+                            <Plus className="w-4 h-4" />
+                            <span>Tambah Mitra Baru</span>
+                        </button>
+                    </div>
+                </div>
+            ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                    {partners.map((partner) => (
+                        <motion.div
+                            key={partner.id}
+                            layout
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className={`rounded-xl bg-white dark:bg-slate-900 border p-5 flex flex-col justify-between transition-all duration-200 hover:border-[#1AC13B]/60 ${
+                                partner.is_active === false
+                                    ? 'border-dashed border-slate-300 dark:border-slate-800 opacity-60'
+                                    : partner.is_featured
+                                    ? 'border-[#1AC13B]/40 dark:border-[#1AC13B]/30'
+                                    : 'border-slate-200/90 dark:border-slate-800'
+                            }`}
+                        >
                             <div>
-                                <h3 className="text-base font-bold text-slate-900 dark:text-white leading-snug">
-                                    {partner.name}
-                                </h3>
+                                {/* Top Card Bar: Category, Status & Action Toggles */}
+                                <div className="flex items-center justify-between mb-4">
+                                    {getCategoryBadge(partner.category)}
 
-                                {partner.partnership_type && (
-                                    <p className="mt-1 text-xs font-semibold text-[#107E27] dark:text-[#3FD27B]">
-                                        {partner.partnership_type}
-                                    </p>
-                                )}
+                                    <div className="flex items-center gap-1">
+                                        {/* Featured Toggle */}
+                                        <button
+                                            onClick={() => handleToggleFeatured(partner)}
+                                            title={partner.is_featured ? 'Hapus dari Mitra Utama' : 'Jadikan Mitra Utama'}
+                                            className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
+                                                partner.is_featured
+                                                    ? 'text-amber-500 bg-amber-50 dark:bg-amber-950/40'
+                                                    : 'text-slate-300 hover:text-slate-500 dark:hover:text-slate-300'
+                                            }`}
+                                        >
+                                            <Star className="w-3.5 h-3.5 fill-current" />
+                                        </button>
 
-                                {partner.description_id || partner.description ? (
-                                    <p className="mt-2 text-xs text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">
-                                        {partner.description_id || partner.description}
-                                    </p>
-                                ) : null}
+                                        {/* Active Status Toggle */}
+                                        <button
+                                            onClick={() => handleToggleStatus(partner)}
+                                            title={partner.is_active ? 'Klik untuk nonaktifkan' : 'Klik untuk aktifkan'}
+                                            className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
+                                                partner.is_active
+                                                    ? 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40'
+                                                    : 'text-slate-400 bg-slate-100 dark:bg-slate-800'
+                                            }`}
+                                        >
+                                            {partner.is_active ? (
+                                                <CheckCircle2 className="w-3.5 h-3.5" />
+                                            ) : (
+                                                <XCircle className="w-3.5 h-3.5" />
+                                            )}
+                                        </button>
+                                    </div>
+                                </div>
 
-                                <div className="mt-3 flex items-center gap-3 text-[11px] text-slate-400">
-                                    {partner.established_year && (
-                                        <span className="inline-flex items-center gap-1">
-                                            <Calendar className="w-3 h-3 text-slate-400" />
-                                            Mitra sejak {partner.established_year}
+                                {/* Logo Presentation Box */}
+                                <div className="h-20 w-full rounded-lg bg-slate-50 dark:bg-slate-800/80 border border-slate-100 dark:border-slate-800 flex items-center justify-center p-3 mb-4 group overflow-hidden">
+                                    {partner.logo_url ? (
+                                        <img
+                                            src={partner.logo_url}
+                                            alt={partner.name}
+                                            className="max-h-12 max-w-[160px] object-contain transition-transform group-hover:scale-105 dark:brightness-0 dark:invert dark:opacity-90"
+                                            onError={(e) => {
+                                                (e.target as HTMLImageElement).style.display = 'none';
+                                            }}
+                                        />
+                                    ) : (
+                                        <span className="text-xs font-black tracking-wider uppercase text-slate-700 dark:text-slate-300 text-center">
+                                            {partner.logo_text || partner.name}
                                         </span>
                                     )}
                                 </div>
+
+                                {/* Partner Info */}
+                                <div>
+                                    <h3 className="text-base font-bold text-slate-900 dark:text-white leading-snug">
+                                        {partner.name}
+                                    </h3>
+
+                                    {partner.partnership_type && (
+                                        <p className="mt-1 text-xs font-semibold text-[#107E27] dark:text-[#3FD27B]">
+                                            {partner.partnership_type}
+                                        </p>
+                                    )}
+
+                                    {partner.description_id || partner.description ? (
+                                        <p className="mt-2 text-xs text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">
+                                            {partner.description_id || partner.description}
+                                        </p>
+                                    ) : null}
+
+                                    <div className="mt-3 flex items-center gap-3 text-[11px] text-slate-400">
+                                        {partner.established_year && (
+                                            <span className="inline-flex items-center gap-1">
+                                                <Calendar className="w-3 h-3 text-slate-400" />
+                                                Mitra sejak {partner.established_year}
+                                            </span>
+                                        )}
+                                    </div>
+                                </div>
                             </div>
-                        </div>
 
-                        {/* Footer Actions */}
-                        <div className="mt-5 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                            {partner.website_url ? (
-                                <a
-                                    href={partner.website_url}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    className="inline-flex items-center gap-1 text-xs font-semibold text-slate-500 dark:text-slate-400 hover:text-[#107E27] dark:hover:text-[#1AC13B] transition-colors"
-                                >
-                                    <Globe className="w-3 h-3" />
-                                    <span>Website</span>
-                                    <ExternalLink className="w-2.5 h-2.5" />
-                                </a>
-                            ) : (
-                                <span className="text-[11px] text-slate-400">Urutan: #{partner.order || 0}</span>
-                            )}
+                            {/* Footer Actions */}
+                            <div className="mt-5 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                                {partner.website_url ? (
+                                    <a
+                                        href={partner.website_url}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="inline-flex items-center gap-1 text-xs font-semibold text-slate-500 dark:text-slate-400 hover:text-[#107E27] dark:hover:text-[#1AC13B] transition-colors"
+                                    >
+                                        <Globe className="w-3 h-3" />
+                                        <span>Website</span>
+                                        <ExternalLink className="w-2.5 h-2.5" />
+                                    </a>
+                                ) : (
+                                    <span className="text-[11px] text-slate-400">Urutan: #{partner.order || 0}</span>
+                                )}
 
-                            <div className="flex items-center gap-1">
-                                <button
-                                    onClick={() => openEditModal(partner)}
-                                    className="p-1.5 rounded-lg text-slate-500 hover:text-[#107E27] dark:hover:text-[#1AC13B] hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
-                                    title="Edit Mitra"
-                                >
-                                    <Edit3 className="w-4 h-4" />
-                                </button>
-                                <button
-                                    onClick={() => confirmDelete(partner)}
-                                    className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors cursor-pointer"
-                                    title="Hapus Mitra"
-                                >
-                                    <Trash2 className="w-4 h-4" />
-                                </button>
+                                <div className="flex items-center gap-1">
+                                    <button
+                                        onClick={() => openEditModal(partner)}
+                                        className="p-1.5 rounded-lg text-slate-500 hover:text-[#107E27] dark:hover:text-[#1AC13B] hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                                        title="Edit Mitra"
+                                    >
+                                        <Edit3 className="w-4 h-4" />
+                                    </button>
+                                    <button
+                                        onClick={() => confirmDelete(partner)}
+                                        className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors cursor-pointer"
+                                        title="Hapus Mitra"
+                                    >
+                                        <Trash2 className="w-4 h-4" />
+                                    </button>
+                                </div>
                             </div>
-                        </div>
-                    </motion.div>
-                ))}
-            </div>
-
-            {/* Empty State */}
-            {partners.length === 0 && (
-                <div className="p-12 text-center rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800">
-                    <Building2 className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
-                    <h3 className="text-base font-bold text-slate-800 dark:text-slate-200">
-                        Tidak ada data mitra ditemukan
-                    </h3>
-                    <p className="mt-1 text-xs text-slate-400 max-w-sm mx-auto">
-                        Coba sesuaikan kata kunci pencarian atau tambah mitra industri baru ke sistem.
-                    </p>
-                    <button
-                        onClick={openCreateModal}
-                        className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#1AC13B] text-white text-xs font-bold hover:bg-[#12A02E] cursor-pointer"
-                    >
-                        <Plus className="w-3.5 h-3.5" />
-                        Tambah Mitra Baru
-                    </button>
+                        </motion.div>
+                    ))}
                 </div>
             )}
 
@@ -662,7 +676,7 @@ export default function PartnersIndex({
                                                 required
                                                 value={data.name}
                                                 onChange={(e) => setData('name', e.target.value)}
-                                                placeholder="Contoh: PT PINDAD (Persero)"
+                                                placeholder="Masukkan nama instansi atau perusahaan mitra..."
                                                 className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#1AC13B]"
                                             />
                                             {errors.name && <p className="mt-1 text-[11px] text-red-500">{errors.name}</p>}
@@ -708,7 +722,7 @@ export default function PartnersIndex({
                                                 type="text"
                                                 value={data.partnership_type}
                                                 onChange={(e) => setData('partnership_type', e.target.value)}
-                                                placeholder="Contoh: Defense & Heavy Manufacturing R&D, Matching Fund..."
+                                                placeholder="Masukkan fokus atau tipe kemitraan..."
                                                 className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#1AC13B]"
                                             />
                                         </div>
@@ -721,7 +735,7 @@ export default function PartnersIndex({
                                                 type="text"
                                                 value={data.logo_text}
                                                 onChange={(e) => setData('logo_text', e.target.value)}
-                                                placeholder="Contoh: PT PINDAD"
+                                                placeholder="Masukkan teks alternatif logo..."
                                                 className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#1AC13B]"
                                             />
                                         </div>
@@ -867,7 +881,7 @@ export default function PartnersIndex({
                                                 rows={2}
                                                 value={data.description_id}
                                                 onChange={(e) => setData('description_id', e.target.value)}
-                                                placeholder="Contoh: Riset kolaboratif deep reinforcement learning untuk rute pengiriman perkotaan..."
+                                                placeholder="Deskripsikan ringkasan cakupan kemitraan riset..."
                                                 className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#1AC13B]"
                                             />
                                         </div>
@@ -880,7 +894,7 @@ export default function PartnersIndex({
                                                 rows={2}
                                                 value={data.description}
                                                 onChange={(e) => setData('description', e.target.value)}
-                                                placeholder="Example: Collaborative research on deep reinforcement learning for urban delivery routes..."
+                                                placeholder="Describe partnership scope and collaborative research overview..."
                                                 className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#1AC13B]"
                                             />
                                         </div>

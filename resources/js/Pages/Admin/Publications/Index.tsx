@@ -231,7 +231,7 @@ export default function PublicationsIndex({
 
     return (
         <AdminLayout
-            title={isEn ? 'Peer-Reviewed Repository' : 'Kelola Repositori Publikasi'}
+            title={isEn ? 'Publications' : 'Kelola Publikasi Ilmiah'}
             siteConfig={siteConfig}
         >
             <div className="space-y-6">
@@ -240,15 +240,15 @@ export default function PublicationsIndex({
                     <div className="space-y-1.5">
                         <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-[#EDFBF1] dark:bg-[#10381C] text-[#107E27] dark:text-[#3FD27B] text-xs font-bold">
                             <BookOpen className="w-3.5 h-3.5" />
-                            <span>{isEn ? 'Peer-Reviewed Scholarly Repository' : 'Repositori Publikasi Ilmiah Bereputasi'}</span>
+                            <span>{isEn ? 'Scholarly Publications' : 'Publikasi & Karya Ilmiah'}</span>
                         </div>
                         <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-                            {isEn ? 'Peer-Reviewed Academic Repository' : 'Repositori Akademik Peer-Reviewed'}
+                            {isEn ? 'Academic Publications & Journals' : 'Publikasi Ilmiah & Jurnal'}
                         </h2>
                         <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 max-w-2xl leading-relaxed">
                             {isEn
-                                ? 'Manage high-impact research papers, international Q1 journal articles, and conference proceedings indexed in Scopus & Web of Science at CoE STAS-RG.'
-                                : 'Kelola direktori makalah riset bereputasi tinggi, artikel jurnal internasional Q1, dan prosiding konferensi terindeks Scopus & Web of Science di CoE STAS-RG.'}
+                                ? 'Manage research papers, journal articles, and conference proceedings by STAS-RG researchers.'
+                                : 'Kelola daftar publikasi artikel jurnal ilmiah, prosiding konferensi internasional, dan karya riset peneliti STAS-RG.'}
                         </p>
                     </div>
 
@@ -259,14 +259,14 @@ export default function PublicationsIndex({
                             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-bold text-slate-800 dark:text-slate-200 hover:text-[#107E27] dark:hover:text-[#1AC13B] transition-colors"
                         >
                             <ExternalLink className="w-4 h-4 text-[#1AC13B]" />
-                            <span>{isEn ? 'View Live Repository' : 'Lihat di Web'}</span>
+                            <span>{isEn ? 'View Live Section' : 'Lihat di Web'}</span>
                         </Link>
                         <button
                             onClick={openCreateModal}
                             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#1AC13B] hover:bg-[#16a331] text-white text-xs font-bold transition-all shadow-none cursor-pointer border-0"
                         >
                             <Plus className="w-4 h-4" />
-                            <span>{isEn ? 'Add Paper' : 'Tambah Publikasi Baru'}</span>
+                            <span>{isEn ? 'Add Publication' : 'Tambah Publikasi Baru'}</span>
                         </button>
                     </div>
                 </div>
@@ -394,141 +394,171 @@ export default function PublicationsIndex({
                     </div>
                 </div>
 
-                {/* 4. Publications List Container */}
-                <div className="space-y-4">
-                    {publications.map((pub, index) => (
-                        <motion.div
-                            key={pub.id}
-                            layout
-                            initial={{ opacity: 0, y: 15 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.2, delay: index * 0.04 }}
-                            className={`p-5 sm:p-6 rounded-2xl bg-white dark:bg-slate-900 border transition-all flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5 group ${
-                                pub.is_active
-                                    ? 'border-slate-200 dark:border-slate-800 hover:border-[#1AC13B]/70'
-                                    : 'border-slate-200/50 dark:border-slate-800/50 opacity-60 bg-slate-50/50 dark:bg-slate-900/40'
-                            }`}
-                        >
-                            <div className="space-y-3 max-w-4xl">
-                                {/* Metadata line */}
-                                <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-                                    <PillBadge
-                                        variant={pub.badge_type === 'green' ? 'green' : 'gray'}
-                                        size="sm"
-                                    >
-                                        {pub.badge}
-                                    </PillBadge>
-                                    <span className="font-bold text-slate-800 dark:text-slate-200">{pub.year}</span>
-                                    <span>•</span>
-                                    <span className="text-slate-700 dark:text-slate-300 font-semibold">{pub.venue}</span>
-                                    <span>•</span>
-                                    <span className="text-slate-400 dark:text-slate-500 font-mono text-[11px]">{pub.doi}</span>
-                                    {pub.indexing && (
-                                        <>
-                                            <span>•</span>
-                                            <span className="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-[10px] font-bold text-slate-600 dark:text-slate-300">
-                                                {pub.indexing}
-                                            </span>
-                                        </>
-                                    )}
-                                </div>
-
-                                {/* Paper Title (Bilingual) */}
-                                <div className="space-y-1">
-                                    <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white group-hover:text-[#107E27] dark:group-hover:text-[#1AC13B] transition-colors leading-snug">
-                                        {pub.title_id || pub.title}
-                                    </h3>
-                                    {pub.title_id && pub.title !== pub.title_id && (
-                                        <div className="text-xs text-slate-400 dark:text-slate-500 italic">
-                                            EN: {pub.title}
-                                        </div>
-                                    )}
-                                </div>
-
-                                {/* Abstract if present */}
-                                {(pub.abstract_id || pub.abstract) && (
-                                    <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">
-                                        {pub.abstract_id || pub.abstract}
-                                    </p>
-                                )}
-
-                                {/* Authors and Citations */}
-                                <div className="flex flex-wrap items-center gap-4 text-xs text-slate-500 dark:text-slate-400 pt-1">
-                                    <div className="flex items-center gap-1.5 font-medium text-slate-600 dark:text-slate-300">
-                                        <Users className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                                        <span>{pub.authors}</span>
+                {/* 4. Publications List or Empty State */}
+                {publications.length === 0 ? (
+                    <div className="p-12 text-center rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-3">
+                        <img
+                            src="/assets/icon/errors/notfound.png"
+                            alt="Tidak ada data"
+                            className="w-28 sm:w-36 h-auto object-contain mx-auto select-none pointer-events-none drop-shadow-xs mb-2"
+                            onError={(e) => {
+                                (e.target as HTMLImageElement).src = '/assets/icon/errors/notfound.png';
+                            }}
+                        />
+                        <h3 className="text-base font-bold text-slate-800 dark:text-slate-200">
+                            {isEn ? 'No scientific publications found' : 'Tidak ada publikasi ilmiah ditemukan'}
+                        </h3>
+                        <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                            {isEn
+                                ? 'Try changing your search keywords, year, quartile filter, or add a new publication record.'
+                                : 'Coba ubah kata kunci pencarian, tahun, atau filter kuartil, atau tambahkan publikasi baru.'}
+                        </p>
+                        <div>
+                            <button
+                                onClick={openCreateModal}
+                                className="mt-2 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#1AC13B] hover:bg-[#12A02E] text-white text-xs font-bold transition-colors cursor-pointer border-0"
+                            >
+                                <Plus className="w-4 h-4" />
+                                <span>{isEn ? 'Add Publication' : 'Tambah Publikasi Baru'}</span>
+                            </button>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="space-y-4">
+                        {publications.map((pub, index) => (
+                            <motion.div
+                                key={pub.id}
+                                layout
+                                initial={{ opacity: 0, y: 15 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.2, delay: index * 0.04 }}
+                                className={`p-5 sm:p-6 rounded-2xl bg-white dark:bg-slate-900 border transition-all flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5 group ${
+                                    pub.is_active
+                                        ? 'border-slate-200 dark:border-slate-800 hover:border-[#1AC13B]/70'
+                                        : 'border-slate-200/50 dark:border-slate-800/50 opacity-60 bg-slate-50/50 dark:bg-slate-900/40'
+                                }`}
+                            >
+                                <div className="space-y-3 max-w-4xl">
+                                    {/* Metadata line */}
+                                    <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+                                        <PillBadge
+                                            variant={pub.badge_type === 'green' ? 'green' : 'gray'}
+                                            size="sm"
+                                        >
+                                            {pub.badge}
+                                        </PillBadge>
+                                        <span className="font-bold text-slate-800 dark:text-slate-200">{pub.year}</span>
+                                        <span>•</span>
+                                        <span className="text-slate-700 dark:text-slate-300 font-semibold">{pub.venue}</span>
+                                        <span>•</span>
+                                        <span className="text-slate-400 dark:text-slate-500 font-mono text-[11px]">{pub.doi}</span>
+                                        {pub.indexing && (
+                                            <>
+                                                <span>•</span>
+                                                <span className="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-[10px] font-bold text-slate-600 dark:text-slate-300">
+                                                    {pub.indexing}
+                                                </span>
+                                            </>
+                                        )}
                                     </div>
 
-                                    {pub.citation_count !== undefined && pub.citation_count > 0 && (
-                                        <div className="flex items-center gap-1 font-bold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 px-2 py-0.5 rounded-md text-[10px]">
-                                            <Quote className="w-3 h-3" />
-                                            <span>{pub.citation_count} Citations</span>
-                                        </div>
+                                    {/* Paper Title (Bilingual) */}
+                                    <div className="space-y-1">
+                                        <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white group-hover:text-[#107E27] dark:group-hover:text-[#1AC13B] transition-colors leading-snug">
+                                            {pub.title_id || pub.title}
+                                        </h3>
+                                        {pub.title_id && pub.title !== pub.title_id && (
+                                            <div className="text-xs text-slate-400 dark:text-slate-500 italic">
+                                                EN: {pub.title}
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Abstract if present */}
+                                    {(pub.abstract_id || pub.abstract) && (
+                                        <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">
+                                            {pub.abstract_id || pub.abstract}
+                                        </p>
                                     )}
+
+                                    {/* Authors and Citations */}
+                                    <div className="flex flex-wrap items-center gap-4 text-xs text-slate-500 dark:text-slate-400 pt-1">
+                                        <div className="flex items-center gap-1.5 font-medium text-slate-600 dark:text-slate-300">
+                                            <Users className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                                            <span>{pub.authors}</span>
+                                        </div>
+
+                                        {pub.citation_count !== undefined && pub.citation_count > 0 && (
+                                            <div className="flex items-center gap-1 font-bold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 px-2 py-0.5 rounded-md text-[10px]">
+                                                <Quote className="w-3 h-3" />
+                                                <span>{pub.citation_count} Citations</span>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
-                            </div>
 
-                            {/* Actions on right */}
-                            <div className="flex flex-wrap items-center gap-2 shrink-0 pt-3 lg:pt-0 border-t lg:border-t-0 border-slate-100 dark:border-slate-800">
-                                {pub.pdf_url && pub.pdf_url !== '#' && (
-                                    <a
-                                        href={pub.pdf_url}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 inline-flex items-center gap-1.5 transition-colors"
+                                {/* Actions on right */}
+                                <div className="flex flex-wrap items-center gap-2 shrink-0 pt-3 lg:pt-0 border-t lg:border-t-0 border-slate-100 dark:border-slate-800">
+                                    {pub.pdf_url && pub.pdf_url !== '#' && (
+                                        <a
+                                            href={pub.pdf_url}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 inline-flex items-center gap-1.5 transition-colors"
+                                        >
+                                            <FileText className="w-3.5 h-3.5 text-slate-500" />
+                                            <span>PDF</span>
+                                        </a>
+                                    )}
+
+                                    {pub.doi_url && (
+                                        <a
+                                            href={pub.doi_url}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="px-3 py-1.5 rounded-xl bg-[#EDFBF1] dark:bg-[#10381C] text-[#107E27] dark:text-[#3FD27B] hover:bg-[#1AC13B] hover:text-white text-xs font-bold inline-flex items-center gap-1.5 transition-colors border border-[#B2EFC3]/60 dark:border-[#1A5C2F]"
+                                        >
+                                            <span>DOI Link</span>
+                                            <ExternalLink className="w-3.5 h-3.5" />
+                                        </a>
+                                    )}
+
+                                    {/* Quick Switch Active */}
+                                    <button
+                                        type="button"
+                                        onClick={() => handleToggleStatus(pub)}
+                                        title={pub.is_active ? 'Click to deactivate' : 'Click to activate'}
+                                        className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition-colors cursor-pointer border-0 ${
+                                            pub.is_active
+                                                ? 'bg-slate-100 dark:bg-slate-800 text-[#107E27] dark:text-[#3FD27B]'
+                                                : 'bg-slate-100 dark:bg-slate-800 text-slate-400'
+                                        }`}
                                     >
-                                        <FileText className="w-3.5 h-3.5 text-slate-500" />
-                                        <span>PDF</span>
-                                    </a>
-                                )}
+                                        {pub.is_active ? (isEn ? 'Active' : 'Aktif') : 'Draft'}
+                                    </button>
 
-                                {pub.doi_url && (
-                                    <a
-                                        href={pub.doi_url}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="px-3 py-1.5 rounded-xl bg-[#EDFBF1] dark:bg-[#10381C] text-[#107E27] dark:text-[#3FD27B] hover:bg-[#1AC13B] hover:text-white text-xs font-bold inline-flex items-center gap-1.5 transition-colors border border-[#B2EFC3]/60 dark:border-[#1A5C2F]"
+                                    {/* Edit & Delete Buttons */}
+                                    <button
+                                        type="button"
+                                        onClick={() => openEditModal(pub)}
+                                        className="p-2 rounded-xl text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer border-0"
+                                        title={isEn ? 'Edit Publication' : 'Ubah Publikasi'}
                                     >
-                                        <span>DOI Link</span>
-                                        <ExternalLink className="w-3.5 h-3.5" />
-                                    </a>
-                                )}
-
-                                {/* Quick Switch Active */}
-                                <button
-                                    type="button"
-                                    onClick={() => handleToggleStatus(pub)}
-                                    title={pub.is_active ? 'Click to deactivate' : 'Click to activate'}
-                                    className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition-colors cursor-pointer border-0 ${
-                                        pub.is_active
-                                            ? 'bg-slate-100 dark:bg-slate-800 text-[#107E27] dark:text-[#3FD27B]'
-                                            : 'bg-slate-100 dark:bg-slate-800 text-slate-400'
-                                    }`}
-                                >
-                                    {pub.is_active ? (isEn ? 'Active' : 'Aktif') : 'Draft'}
-                                </button>
-
-                                {/* Edit & Delete Buttons */}
-                                <button
-                                    type="button"
-                                    onClick={() => openEditModal(pub)}
-                                    className="p-2 rounded-xl text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer border-0"
-                                    title={isEn ? 'Edit Publication' : 'Ubah Publikasi'}
-                                >
-                                    <Edit3 className="w-4 h-4" />
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => setPubToDelete(pub)}
-                                    className="p-2 rounded-xl text-red-500 hover:text-red-700 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors cursor-pointer border-0"
-                                    title={isEn ? 'Delete Publication' : 'Hapus Publikasi'}
-                                >
-                                    <Trash2 className="w-4 h-4" />
-                                </button>
-                            </div>
-                        </motion.div>
-                    ))}
-                </div>
+                                        <Edit3 className="w-4 h-4" />
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setPubToDelete(pub)}
+                                        className="p-2 rounded-xl text-red-500 hover:text-red-700 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors cursor-pointer border-0"
+                                        title={isEn ? 'Delete Publication' : 'Hapus Publikasi'}
+                                    >
+                                        <Trash2 className="w-4 h-4" />
+                                    </button>
+                                </div>
+                            </motion.div>
+                        ))}
+                    </div>
+                )}
 
                 {/* 5. Create / Edit Publication Modal Dialog */}
                 <AnimatePresence>
@@ -659,7 +689,7 @@ export default function PublicationsIndex({
                                                         required
                                                         value={form.data.title_id}
                                                         onChange={(e) => form.setData('title_id', e.target.value)}
-                                                        placeholder="contoh: Penjadwalan Energi Terdesentralisasi pada Microgrid Hibrida Menggunakan Pembelajaran Penguatan Multi-Agen"
+                                                        placeholder="Masukkan judul makalah atau publikasi ilmiah..."
                                                         className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-900 dark:text-white focus:outline-none focus:border-[#1AC13B]"
                                                     />
                                                 </div>
@@ -672,7 +702,7 @@ export default function PublicationsIndex({
                                                         rows={3}
                                                         value={form.data.abstract_id}
                                                         onChange={(e) => form.setData('abstract_id', e.target.value)}
-                                                        placeholder="contoh: Makalah ini menyajikan strategi penjadwalan terdesentralisasi menggunakan pembelajaran penguatan multi-agen..."
+                                                        placeholder="Masukkan abstrak atau ringkasan publikasi ilmiah..."
                                                         className="w-full px-3.5 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#1AC13B]"
                                                     />
                                                 </div>
@@ -689,7 +719,7 @@ export default function PublicationsIndex({
                                                         required
                                                         value={form.data.title}
                                                         onChange={(e) => form.setData('title', e.target.value)}
-                                                        placeholder="e.g. Decentralized Energy Scheduling in Hybrid Microgrids Using Multi-Agent Reinforcement Learning"
+                                                        placeholder="Enter publication title in English..."
                                                         className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-900 dark:text-white focus:outline-none focus:border-[#1AC13B]"
                                                     />
                                                 </div>
@@ -702,7 +732,7 @@ export default function PublicationsIndex({
                                                         rows={3}
                                                         value={form.data.abstract}
                                                         onChange={(e) => form.setData('abstract', e.target.value)}
-                                                        placeholder="e.g. This paper presents a decentralized scheduling strategy using multi-agent deep reinforcement learning..."
+                                                        placeholder="Enter publication abstract in English..."
                                                         className="w-full px-3.5 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#1AC13B]"
                                                     />
                                                 </div>
@@ -721,7 +751,7 @@ export default function PublicationsIndex({
                                                 required
                                                 value={form.data.authors}
                                                 onChange={(e) => form.setData('authors', e.target.value)}
-                                                placeholder="e.g. Rahmawati, S., Hendra, S., Pratama, A., & Chen, W."
+                                                placeholder={isEn ? 'Enter authors list separated by comma...' : 'Masukkan daftar nama penulis dipisah koma...'}
                                                 className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#1AC13B]"
                                             />
                                         </div>
@@ -735,7 +765,7 @@ export default function PublicationsIndex({
                                                 required
                                                 value={form.data.venue}
                                                 onChange={(e) => form.setData('venue', e.target.value)}
-                                                placeholder="e.g. IEEE Transactions on Sustainable Energy"
+                                                placeholder={isEn ? 'Enter journal or conference venue name...' : 'Masukkan nama jurnal atau konferensi ilmiah...'}
                                                 className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#1AC13B]"
                                             />
                                         </div>

@@ -6,6 +6,7 @@ import { EnterpriseService } from '../../types';
 import { motion } from 'framer-motion';
 import { ArrowRight, CheckCircle2, UserCheck, Sparkles } from 'lucide-react';
 import { TranslationDictionary } from '../../utils/translations';
+import { EmptyState } from '../Common/EmptyState';
 
 interface ServicesSectionProps {
     services: EnterpriseService[];
@@ -14,6 +15,7 @@ interface ServicesSectionProps {
 
 export const ServicesSection: React.FC<ServicesSectionProps> = ({ services, t }) => {
     const isIndonesian = t.exploreService === 'Pelajari Layanan' || t.exploreService.includes('Pelajari');
+    const activeServices = (services || []).filter((s) => s.is_active !== false);
 
     return (
         <section id="services" className="py-20 md:py-28 bg-white dark:bg-slate-950 border-b border-slate-100 dark:border-slate-900 transition-colors">
@@ -25,14 +27,13 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ services, t })
                     align="between"
                     actionLink={{
                         text: t.actionLink,
-                        href: '#services',
+                        href: '/services',
                     }}
                 />
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {services
-                        .filter((s) => s.is_active !== false)
-                        .map((service, index) => {
+                {activeServices.length > 0 ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {activeServices.map((service, index) => {
                             const displayTitle = isIndonesian ? (service.title_id || service.title) : (service.title || service.title_id);
                             const displaySummary = isIndonesian ? (service.summary_id || service.summary) : (service.summary || service.summary_id);
                             const displayActionLabel = isIndonesian 
@@ -129,8 +130,15 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ services, t })
                                 </motion.div>
                             );
                         })}
-                </div>
+                    </div>
+                ) : (
+                    <EmptyState
+                        title={isIndonesian ? 'Tidak ada data layanan industri ditemukan' : 'No enterprise services found'}
+                        description={isIndonesian ? 'Daftar layanan industri & konsultansi belum tersedia di database.' : 'Enterprise services & consultancy offerings are not available in the database.'}
+                    />
+                )}
             </div>
         </section>
     );
 };
+

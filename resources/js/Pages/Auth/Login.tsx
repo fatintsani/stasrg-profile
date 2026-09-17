@@ -239,7 +239,7 @@ export default function AuthPage({
                                             required
                                             value={registerForm.data.name}
                                             onChange={(e) => registerForm.setData('name', e.target.value)}
-                                            placeholder="e.g. Dr. Jane Doe, S.T., M.T."
+                                            placeholder={language === 'ID' ? 'Masukkan nama lengkap beserta gelar Anda' : 'Enter your full name with academic title'}
                                             className="w-full pl-10 pr-3.5 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs sm:text-sm font-medium text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-[#1AC13B] focus:ring-1 focus:ring-[#1AC13B] transition-all"
                                         />
                                     </div>
@@ -279,7 +279,7 @@ export default function AuthPage({
                                             required
                                             value={registerForm.data.institution}
                                             onChange={(e) => registerForm.setData('institution', e.target.value)}
-                                            placeholder="e.g. Telkom University / Industry Partner"
+                                            placeholder={language === 'ID' ? 'Masukkan nama instansi, departemen, atau mitra' : 'Enter your institution or organization name'}
                                             className="w-full pl-10 pr-3.5 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs sm:text-sm font-medium text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-[#1AC13B] focus:ring-1 focus:ring-[#1AC13B] transition-all"
                                         />
                                     </div>

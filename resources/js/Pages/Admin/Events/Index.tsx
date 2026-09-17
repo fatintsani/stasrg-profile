@@ -18,8 +18,6 @@ import {
     Users,
     Sparkles,
     FileText,
-    Download,
-    Eye,
     LayoutGrid,
     Table as TableIcon,
     X,
@@ -33,7 +31,6 @@ import {
     SlidersHorizontal,
     Globe2,
     Layers,
-    ChevronRight,
 } from 'lucide-react';
 import { AlertModal } from '../../../Components/Common/AlertModal';
 
@@ -164,6 +161,7 @@ export default function EventsIndex({
     const openCreateModal = () => {
         setEditingEvent(null);
         form.reset();
+        form.clearErrors();
         form.setData({
             tag: 'UPCOMING SYMPOSIUM',
             title: '',
@@ -196,6 +194,7 @@ export default function EventsIndex({
 
     const openEditModal = (event: UpcomingEvent) => {
         setEditingEvent(event);
+        form.clearErrors();
         form.setData({
             tag: event.tag || 'UPCOMING SYMPOSIUM',
             title: event.title || '',
@@ -300,186 +299,224 @@ export default function EventsIndex({
 
     return (
         <AdminLayout
-            title="Kelola Simposium & Masterclass"
+            title="Kelola Agenda & Acara"
             siteConfig={siteConfig}
         >
-            <div className="space-y-6 pb-12">
-                {/* 1. Header Banner & Page Action */}
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gradient-to-r from-emerald-900 via-slate-900 to-slate-950 p-6 md:p-8 rounded-3xl text-white shadow-xl relative overflow-hidden border border-emerald-800/40">
-                    <div className="absolute right-0 top-0 translate-x-12 -translate-y-12 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
-                    <div className="relative z-10 space-y-2">
-                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-semibold tracking-wider uppercase border border-emerald-500/30">
-                            <Sparkles className="w-3.5 h-3.5" />
-                            Academic Agenda & Masterclass Management
+            <div className="space-y-6">
+                {/* 1. Header Banner */}
+                <div className="p-6 md:p-8 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                    <div className="space-y-1.5">
+                        <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-[#EDFBF1] dark:bg-[#10381C] text-[#107E27] dark:text-[#3FD27B] text-xs font-bold border border-[#B2EFC3] dark:border-[#1A5C2F]">
+                            <Calendar className="w-3.5 h-3.5 text-[#1AC13B]" />
+                            <span>Agenda & Acara Riset</span>
                         </div>
-                        <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-white">
-                            Agenda Simposium, Masterclass & Workshop
-                        </h1>
-                        <p className="text-sm md:text-base text-slate-300 max-w-2xl">
-                            Kelola jadwal simposium akademik, masterclass eksekutif, workshop praktis laboratorium, dan seminar diseminasi riset STAS-RG.
+                        <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+                            Agenda Simposium, Workshop & Pelatihan
+                        </h2>
+                        <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 max-w-2xl leading-relaxed">
+                            Kelola jadwal simposium ilmiah, workshop laboratorium, webinar publik, dan pelatihan riset CoE STAS-RG.
                         </p>
                     </div>
 
-                    <div className="relative z-10 flex items-center gap-3">
+                    <div className="flex items-center gap-3 shrink-0">
+                        <Link
+                            href="/#events"
+                            target="_blank"
+                            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-bold text-slate-800 dark:text-slate-200 hover:text-[#107E27] dark:hover:text-[#1AC13B] transition-colors shadow-xs"
+                        >
+                            <ExternalLink className="w-4 h-4 text-[#1AC13B]" />
+                            <span>Lihat di Beranda</span>
+                        </Link>
                         <button
                             onClick={openCreateModal}
-                            className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold shadow-lg shadow-emerald-500/20 transition duration-200 transform hover:-translate-y-0.5 active:translate-y-0 text-sm"
+                            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#1AC13B] hover:bg-[#12A02E] text-white text-xs font-bold transition-all shadow-sm cursor-pointer border-0"
                         >
-                            <Plus className="w-5 h-5 stroke-[2.5]" />
-                            Tambah Agenda Baru
+                            <Plus className="w-4 h-4" />
+                            <span>Tambah Agenda Baru</span>
                         </button>
                     </div>
                 </div>
 
                 {/* 2. KPI Metrics Grid */}
-                <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                    <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-1">
                         <div className="flex items-center justify-between">
-                            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Total Agenda</span>
-                            <Calendar className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Agenda</span>
+                            <Calendar className="w-4 h-4 text-[#1AC13B]" />
                         </div>
-                        <div className="text-2xl font-bold text-slate-900 dark:text-white mt-2">{stats.total}</div>
-                        <div className="text-xs text-slate-500 mt-1">Seluruh agenda kegiatan</div>
+                        <div className="mt-2 text-2xl font-extrabold text-slate-900 dark:text-white">
+                            {stats.total}
+                        </div>
+                        <div className="text-[11px] text-slate-400">Seluruh Agenda Kegiatan</div>
                     </div>
 
-                    <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm">
+                    <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-1">
                         <div className="flex items-center justify-between">
-                            <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">Aktif Tayang</span>
-                            <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Agenda Aktif</span>
+                            <CheckCircle2 className="w-4 h-4 text-emerald-500" />
                         </div>
-                        <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-400 mt-2">{stats.active}</div>
-                        <div className="text-xs text-slate-500 mt-1">Ditampilkan di portal utama</div>
+                        <div className="mt-2 text-2xl font-extrabold text-slate-900 dark:text-white">
+                            {stats.active}
+                        </div>
+                        <div className="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold">
+                            Tampil di Beranda Utama
+                        </div>
                     </div>
 
-                    <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm">
+                    <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-1">
                         <div className="flex items-center justify-between">
-                            <span className="text-xs font-semibold text-amber-600 dark:text-amber-400 uppercase tracking-wider">Agenda Utama</span>
-                            <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
+                            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Agenda Utama</span>
+                            <Sparkles className="w-4 h-4 text-amber-500" />
                         </div>
-                        <div className="text-2xl font-bold text-amber-600 dark:text-amber-400 mt-2">{stats.featured}</div>
-                        <div className="text-xs text-slate-500 mt-1">Highlighted & featured banner</div>
+                        <div className="mt-2 text-2xl font-extrabold text-slate-900 dark:text-white">
+                            {stats.featured}
+                        </div>
+                        <div className="text-[11px] text-amber-600 dark:text-amber-400 font-semibold">
+                            Sorotan Acara Unggulan
+                        </div>
                     </div>
 
-                    <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm">
+                    <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-1">
                         <div className="flex items-center justify-between">
-                            <span className="text-xs font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wider">Simposium / Master</span>
-                            <Presentation className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Simposium / Master</span>
+                            <Presentation className="w-4 h-4 text-blue-500" />
                         </div>
-                        <div className="text-2xl font-bold text-blue-600 dark:text-blue-400 mt-2">{stats.symposia_masterclass}</div>
-                        <div className="text-xs text-slate-500 mt-1">Simposium & Masterclass</div>
-                    </div>
-
-                    <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm col-span-2 md:col-span-1">
-                        <div className="flex items-center justify-between">
-                            <span className="text-xs font-semibold text-teal-600 dark:text-teal-400 uppercase tracking-wider">Workshop / Webinar</span>
-                            <Flame className="w-4 h-4 text-teal-600 dark:text-teal-400" />
+                        <div className="mt-2 text-2xl font-extrabold text-slate-900 dark:text-white">
+                            {stats.symposia_masterclass}
                         </div>
-                        <div className="text-2xl font-bold text-teal-600 dark:text-teal-400 mt-2">{stats.workshops_webinars}</div>
-                        <div className="text-xs text-slate-500 mt-1">Praktik lab & webinar publik</div>
+                        <div className="text-[11px] text-slate-400">Simposium & Masterclass</div>
                     </div>
                 </div>
 
-                {/* 3. Search Bar, Filters & View Toggle */}
-                <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-4">
-                    <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
-                        <form onSubmit={handleSearch} className="flex-1 relative">
-                            <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-                            <input
-                                type="text"
-                                placeholder="Cari agenda berdasarkan judul, pembicara, lokasi, atau tag..."
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full pl-10 pr-4 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition"
-                            />
-                        </form>
+                {/* 3. Filters & Search Toolbar */}
+                <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    {/* Search Bar */}
+                    <form onSubmit={handleSearch} className="relative flex-1 max-w-md">
+                        <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                        <input
+                            type="text"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            placeholder="Cari judul agenda, pembicara, lokasi, atau tag..."
+                            className="w-full pl-9 pr-9 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-[#1AC13B]"
+                        />
+                        {searchQuery && (
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setSearchQuery('');
+                                    router.get(
+                                        '/admin/events',
+                                        { tag: selectedTag !== 'all' ? selectedTag : undefined, status: selectedStatus !== 'all' ? selectedStatus : undefined },
+                                        { preserveState: true }
+                                    );
+                                }}
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
+                            >
+                                <X className="w-3.5 h-3.5" />
+                            </button>
+                        )}
+                    </form>
 
-                        <div className="flex items-center gap-2">
-                            {/* Status Filter */}
+                    {/* Filters & View Toggle */}
+                    <div className="flex flex-wrap items-center gap-2.5">
+                        {/* Status Dropdown */}
+                        <div className="flex items-center gap-1.5">
+                            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Status:</span>
                             <select
                                 value={selectedStatus}
                                 onChange={(e) => handleStatusChange(e.target.value)}
-                                className="px-3 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition"
+                                className="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 focus:outline-none focus:border-[#1AC13B]"
                             >
                                 <option value="all">Semua Status</option>
                                 <option value="active">Hanya Aktif</option>
                                 <option value="featured">Hanya Unggulan</option>
                                 <option value="inactive">Hanya Draft</option>
                             </select>
+                        </div>
 
-                            {/* View Switcher */}
-                            <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200/80 dark:border-slate-700">
-                                <button
-                                    onClick={() => setViewMode('grid')}
-                                    className={`p-2 rounded-lg text-xs font-semibold transition ${
-                                        viewMode === 'grid'
-                                            ? 'bg-white dark:bg-slate-700 text-emerald-600 dark:text-emerald-400 shadow-sm'
-                                            : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
-                                    }`}
-                                    title="Tampilan Grid Kartu"
-                                >
-                                    <LayoutGrid className="w-4 h-4" />
-                                </button>
-                                <button
-                                    onClick={() => setViewMode('table')}
-                                    className={`p-2 rounded-lg text-xs font-semibold transition ${
-                                        viewMode === 'table'
-                                            ? 'bg-white dark:bg-slate-700 text-emerald-600 dark:text-emerald-400 shadow-sm'
-                                            : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
-                                    }`}
-                                    title="Tampilan Tabel Rinci"
-                                >
-                                    <TableIcon className="w-4 h-4" />
-                                </button>
-                            </div>
+                        {/* View Switcher */}
+                        <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
+                            <button
+                                onClick={() => setViewMode('grid')}
+                                className={`p-1.5 rounded-lg text-xs font-semibold transition cursor-pointer ${
+                                    viewMode === 'grid'
+                                        ? 'bg-white dark:bg-slate-700 text-[#107E27] dark:text-[#3FD27B] shadow-xs'
+                                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
+                                }`}
+                                title="Tampilan Grid Kartu"
+                            >
+                                <LayoutGrid className="w-4 h-4" />
+                            </button>
+                            <button
+                                onClick={() => setViewMode('table')}
+                                className={`p-1.5 rounded-lg text-xs font-semibold transition cursor-pointer ${
+                                    viewMode === 'table'
+                                        ? 'bg-white dark:bg-slate-700 text-[#107E27] dark:text-[#3FD27B] shadow-xs'
+                                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
+                                }`}
+                                title="Tampilan Tabel Rinci"
+                            >
+                                <TableIcon className="w-4 h-4" />
+                            </button>
                         </div>
                     </div>
+                </div>
 
-                    {/* Tag Filter Pills */}
-                    <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-thin">
+                {/* Tag Filter Pills */}
+                <div className="flex flex-wrap items-center gap-2">
+                    <button
+                        onClick={() => handleTagChange('all')}
+                        className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition border cursor-pointer ${
+                            selectedTag === 'all'
+                                ? 'bg-[#1AC13B] text-white border-[#1AC13B] shadow-xs'
+                                : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800'
+                        }`}
+                    >
+                        Semua Kategori ({stats.total})
+                    </button>
+                    {TAG_OPTIONS.map((tag) => (
                         <button
-                            onClick={() => handleTagChange('all')}
-                            className={`px-3 py-1.5 rounded-xl text-xs font-medium whitespace-nowrap transition border ${
-                                selectedTag === 'all'
-                                    ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm shadow-emerald-500/20'
-                                    : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-transparent hover:bg-slate-200 dark:hover:bg-slate-700'
+                            key={tag.value}
+                            onClick={() => handleTagChange(tag.value)}
+                            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition border cursor-pointer ${
+                                selectedTag === tag.value
+                                    ? 'bg-[#1AC13B] text-white border-[#1AC13B] shadow-xs'
+                                    : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800'
                             }`}
                         >
-                            Semua Kategori ({stats.total})
+                            <tag.icon className="w-3.5 h-3.5" />
+                            {tag.value}
                         </button>
-                        {TAG_OPTIONS.map((tag) => (
-                            <button
-                                key={tag.value}
-                                onClick={() => handleTagChange(tag.value)}
-                                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium whitespace-nowrap transition border ${
-                                    selectedTag === tag.value
-                                        ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm'
-                                        : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-transparent hover:bg-slate-200 dark:hover:bg-slate-700'
-                                }`}
-                            >
-                                <tag.icon className="w-3.5 h-3.5" />
-                                {tag.value}
-                            </button>
-                        ))}
-                    </div>
+                    ))}
                 </div>
 
                 {/* 4. Events Content Display (Grid or Table) */}
                 {events.length === 0 ? (
-                    <div className="bg-white dark:bg-slate-900 rounded-3xl p-12 text-center border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-4">
-                        <div className="w-16 h-16 rounded-2xl bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto border border-emerald-200 dark:border-emerald-800/50">
-                            <Calendar className="w-8 h-8" />
-                        </div>
-                        <h3 className="text-lg font-bold text-slate-900 dark:text-white">Tidak Ada Agenda Kegiatan Ditemukan</h3>
-                        <p className="text-sm text-slate-500 dark:text-slate-400 max-w-md mx-auto">
-                            Belum ada agenda simposium atau masterclass yang cocok dengan kriteria pencarian dan filter Anda saat ini.
+                    <div className="p-12 text-center rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-3">
+                        <img
+                            src="/assets/icon/errors/notfound.png"
+                            alt="Tidak ada data"
+                            className="w-28 sm:w-36 h-auto object-contain mx-auto select-none pointer-events-none drop-shadow-xs mb-2"
+                            onError={(e) => {
+                                (e.target as HTMLImageElement).src = '/assets/icon/errors/notfound.png';
+                            }}
+                        />
+                        <h3 className="text-base font-bold text-slate-800 dark:text-slate-200">
+                            Tidak ada agenda acara ditemukan
+                        </h3>
+                        <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                            Coba ubah kata kunci pencarian atau filter kategori, atau tambahkan agenda acara baru.
                         </p>
-                        <button
-                            onClick={openCreateModal}
-                            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm shadow-md transition"
-                        >
-                            <Plus className="w-4 h-4" />
-                            Tambah Agenda Baru
-                        </button>
+                        <div>
+                            <button
+                                onClick={openCreateModal}
+                                className="mt-2 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#1AC13B] hover:bg-[#12A02E] text-white text-xs font-bold transition-colors cursor-pointer border-0"
+                            >
+                                <Plus className="w-4 h-4" />
+                                <span>Tambah Agenda Baru</span>
+                            </button>
+                        </div>
                     </div>
                 ) : viewMode === 'grid' ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -488,8 +525,8 @@ export default function EventsIndex({
                                 key={event.id}
                                 className={`group bg-white dark:bg-slate-900 rounded-2xl border transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex flex-col overflow-hidden relative ${
                                     event.is_featured
-                                        ? 'border-emerald-300 dark:border-emerald-800/70 shadow-sm shadow-emerald-500/5'
-                                        : 'border-slate-200 dark:border-slate-800 shadow-sm'
+                                        ? 'border-emerald-300 dark:border-emerald-800/70 shadow-xs shadow-emerald-500/5'
+                                        : 'border-slate-200 dark:border-slate-800 shadow-xs'
                                 }`}
                             >
                                 {/* Poster Image & Badges */}
@@ -506,19 +543,19 @@ export default function EventsIndex({
 
                                     {/* Top badges */}
                                     <div className="absolute top-3 left-3 right-3 flex items-center justify-between gap-2">
-                                        <span className={`px-2.5 py-1 rounded-lg text-[11px] font-bold tracking-wider uppercase border shadow-sm backdrop-blur-md ${getTagStyle(event.tag)}`}>
+                                        <span className={`px-2.5 py-1 rounded-lg text-[11px] font-bold tracking-wider uppercase border shadow-xs backdrop-blur-md ${getTagStyle(event.tag)}`}>
                                             {event.tag}
                                         </span>
 
                                         <div className="flex items-center gap-1.5">
                                             {event.is_featured && (
-                                                <span className="px-2 py-1 rounded-lg bg-amber-500/90 text-slate-950 text-[11px] font-bold flex items-center gap-1 shadow-sm backdrop-blur-md">
+                                                <span className="px-2 py-1 rounded-lg bg-amber-500/90 text-slate-950 text-[11px] font-bold flex items-center gap-1 shadow-xs backdrop-blur-md">
                                                     <Star className="w-3 h-3 fill-slate-950" />
                                                     Unggulan
                                                 </span>
                                             )}
                                             <span
-                                                className={`px-2 py-1 rounded-lg text-[11px] font-bold flex items-center gap-1 shadow-sm backdrop-blur-md ${
+                                                className={`px-2 py-1 rounded-lg text-[11px] font-bold flex items-center gap-1 shadow-xs backdrop-blur-md ${
                                                     event.is_active
                                                         ? 'bg-emerald-500/90 text-slate-950'
                                                         : 'bg-slate-800/90 text-slate-300 border border-slate-700'
@@ -550,7 +587,7 @@ export default function EventsIndex({
                                         {/* Speaker Pill */}
                                         {event.speaker_name && (
                                             <div className="flex items-center gap-2 p-2 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/60">
-                                                <div className="w-7 h-7 rounded-lg bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                                                <div className="w-7 h-7 rounded-lg bg-[#EDFBF1] dark:bg-[#10381C] text-[#107E27] dark:text-[#3FD27B] flex items-center justify-center shrink-0">
                                                     <UserCheck className="w-4 h-4" />
                                                 </div>
                                                 <div className="truncate text-xs">
@@ -567,7 +604,7 @@ export default function EventsIndex({
                                         )}
 
                                         {/* Title */}
-                                        <h3 className="font-bold text-base text-slate-900 dark:text-white line-clamp-2 leading-snug group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                                        <h3 className="font-bold text-base text-slate-900 dark:text-white line-clamp-2 leading-snug group-hover:text-[#107E27] dark:group-hover:text-[#3FD27B] transition-colors">
                                             {event.title_id || event.title}
                                         </h3>
 
@@ -584,7 +621,7 @@ export default function EventsIndex({
 
                                         {/* Quota & Registration */}
                                         {event.quota_text && (
-                                            <div className="flex items-center gap-1.5 text-xs font-medium text-emerald-600 dark:text-emerald-400">
+                                            <div className="flex items-center gap-1.5 text-xs font-semibold text-[#107E27] dark:text-[#3FD27B]">
                                                 <Ticket className="w-3.5 h-3.5" />
                                                 <span>{event.quota_text}</span>
                                             </div>
@@ -596,7 +633,7 @@ export default function EventsIndex({
                                         <div className="flex items-center gap-1">
                                             <button
                                                 onClick={() => handleToggleStatus(event.id)}
-                                                className={`p-1.5 rounded-lg text-xs font-semibold transition ${
+                                                className={`p-1.5 rounded-lg text-xs font-semibold transition cursor-pointer ${
                                                     event.is_active
                                                         ? 'text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/40'
                                                         : 'text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
@@ -607,7 +644,7 @@ export default function EventsIndex({
                                             </button>
                                             <button
                                                 onClick={() => handleToggleFeatured(event.id)}
-                                                className={`p-1.5 rounded-lg text-xs font-semibold transition ${
+                                                className={`p-1.5 rounded-lg text-xs font-semibold transition cursor-pointer ${
                                                     event.is_featured
                                                         ? 'text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-950/40'
                                                         : 'text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
@@ -621,14 +658,14 @@ export default function EventsIndex({
                                         <div className="flex items-center gap-1.5">
                                             <button
                                                 onClick={() => openEditModal(event)}
-                                                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-xs transition"
+                                                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-xs transition cursor-pointer"
                                             >
                                                 <Edit3 className="w-3.5 h-3.5" />
                                                 Edit
                                             </button>
                                             <button
                                                 onClick={() => confirmDelete(event)}
-                                                className="p-1.5 rounded-lg text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition"
+                                                className="p-1.5 rounded-lg text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition cursor-pointer"
                                                 title="Hapus agenda"
                                             >
                                                 <Trash2 className="w-4 h-4" />
@@ -641,7 +678,7 @@ export default function EventsIndex({
                     </div>
                 ) : (
                     /* Table View */
-                    <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm overflow-hidden">
+                    <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs overflow-hidden">
                         <div className="overflow-x-auto">
                             <table className="w-full text-left text-sm">
                                 <thead className="bg-slate-50 dark:bg-slate-800/60 text-slate-500 dark:text-slate-400 font-semibold text-xs border-b border-slate-200 dark:border-slate-800">
@@ -713,7 +750,7 @@ export default function EventsIndex({
                                                 <div className="flex items-center justify-center gap-1.5">
                                                     <button
                                                         onClick={() => handleToggleStatus(event.id)}
-                                                        className={`px-2 py-0.5 rounded text-[11px] font-bold ${
+                                                        className={`px-2 py-0.5 rounded text-[11px] font-bold cursor-pointer ${
                                                             event.is_active
                                                                 ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400'
                                                                 : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400'
@@ -731,14 +768,14 @@ export default function EventsIndex({
                                                 <div className="flex items-center justify-end gap-1">
                                                     <button
                                                         onClick={() => openEditModal(event)}
-                                                        className="p-1.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
+                                                        className="p-1.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
                                                         title="Edit agenda"
                                                     >
                                                         <Edit3 className="w-4 h-4" />
                                                     </button>
                                                     <button
                                                         onClick={() => confirmDelete(event)}
-                                                        className="p-1.5 rounded-lg text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40"
+                                                        className="p-1.5 rounded-lg text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 cursor-pointer"
                                                         title="Hapus agenda"
                                                     >
                                                         <Trash2 className="w-4 h-4" />
@@ -770,8 +807,8 @@ export default function EventsIndex({
                             {/* Modal Header */}
                             <div className="flex items-center justify-between px-6 py-4 bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-800">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold">
-                                        <Calendar className="w-5 h-5" />
+                                    <div className="w-10 h-10 rounded-xl bg-[#EDFBF1] dark:bg-[#10381C] text-[#107E27] dark:text-[#3FD27B] flex items-center justify-center font-bold">
+                                        <Calendar className="w-5 h-5 text-[#1AC13B]" />
                                     </div>
                                     <div>
                                         <h3 className="font-bold text-lg text-slate-900 dark:text-white">
@@ -784,7 +821,7 @@ export default function EventsIndex({
                                 </div>
                                 <button
                                     onClick={() => setIsModalOpen(false)}
-                                    className="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+                                    className="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
                                 >
                                     <X className="w-5 h-5" />
                                 </button>
@@ -795,9 +832,9 @@ export default function EventsIndex({
                                 <button
                                     type="button"
                                     onClick={() => setActiveTab('info')}
-                                    className={`py-3 px-3 text-xs font-bold border-b-2 transition flex items-center gap-2 ${
+                                    className={`py-3 px-3 text-xs font-bold border-b-2 transition flex items-center gap-2 cursor-pointer ${
                                         activeTab === 'info'
-                                            ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400'
+                                            ? 'border-[#1AC13B] text-[#107E27] dark:text-[#3FD27B]'
                                             : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                                     }`}
                                 >
@@ -808,9 +845,9 @@ export default function EventsIndex({
                                 <button
                                     type="button"
                                     onClick={() => setActiveTab('media')}
-                                    className={`py-3 px-3 text-xs font-bold border-b-2 transition flex items-center gap-2 ${
+                                    className={`py-3 px-3 text-xs font-bold border-b-2 transition flex items-center gap-2 cursor-pointer ${
                                         activeTab === 'media'
-                                            ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400'
+                                            ? 'border-[#1AC13B] text-[#107E27] dark:text-[#3FD27B]'
                                             : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                                     }`}
                                 >
@@ -821,9 +858,9 @@ export default function EventsIndex({
                                 <button
                                     type="button"
                                     onClick={() => setActiveTab('content')}
-                                    className={`py-3 px-3 text-xs font-bold border-b-2 transition flex items-center gap-2 ${
+                                    className={`py-3 px-3 text-xs font-bold border-b-2 transition flex items-center gap-2 cursor-pointer ${
                                         activeTab === 'content'
-                                            ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400'
+                                            ? 'border-[#1AC13B] text-[#107E27] dark:text-[#3FD27B]'
                                             : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                                     }`}
                                 >
@@ -834,9 +871,9 @@ export default function EventsIndex({
                                 <button
                                     type="button"
                                     onClick={() => setActiveTab('settings')}
-                                    className={`py-3 px-3 text-xs font-bold border-b-2 transition flex items-center gap-2 ${
+                                    className={`py-3 px-3 text-xs font-bold border-b-2 transition flex items-center gap-2 cursor-pointer ${
                                         activeTab === 'settings'
-                                            ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400'
+                                            ? 'border-[#1AC13B] text-[#107E27] dark:text-[#3FD27B]'
                                             : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                                     }`}
                                 >
@@ -859,7 +896,7 @@ export default function EventsIndex({
                                                 <select
                                                     value={form.data.tag}
                                                     onChange={(e) => form.setData('tag', e.target.value)}
-                                                    className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition"
+                                                    className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-[#1AC13B] transition"
                                                 >
                                                     {TAG_OPTIONS.map((opt) => (
                                                         <option key={opt.value} value={opt.value}>
@@ -877,10 +914,10 @@ export default function EventsIndex({
                                                 </label>
                                                 <input
                                                     type="text"
-                                                    placeholder="Contoh: Terbuka untuk 120 Peserta / Early Bird"
+                                                    placeholder="Masukkan status kuota atau kapasitas pendaftaran..."
                                                     value={form.data.quota_text}
                                                     onChange={(e) => form.setData('quota_text', e.target.value)}
-                                                    className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition"
+                                                    className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-[#1AC13B] transition"
                                                 />
                                             </div>
                                         </div>
@@ -893,10 +930,10 @@ export default function EventsIndex({
                                                 </label>
                                                 <input
                                                     type="text"
-                                                    placeholder="Contoh: 24-25 OKTOBER 2026"
+                                                    placeholder="Masukkan format tampilan tanggal..."
                                                     value={form.data.date_display}
                                                     onChange={(e) => form.setData('date_display', e.target.value)}
-                                                    className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition font-mono text-xs"
+                                                    className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-[#1AC13B] transition font-mono text-xs"
                                                 />
                                                 {form.errors.date_display && <p className="text-xs text-rose-500 mt-1">{form.errors.date_display}</p>}
                                             </div>
@@ -908,10 +945,10 @@ export default function EventsIndex({
                                                 </label>
                                                 <input
                                                     type="text"
-                                                    placeholder="Contoh: 09:00 - 16:30 WIB"
+                                                    placeholder="Masukkan format jam pelaksanaan..."
                                                     value={form.data.time_display}
                                                     onChange={(e) => form.setData('time_display', e.target.value)}
-                                                    className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition"
+                                                    className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-[#1AC13B] transition"
                                                 />
                                             </div>
 
@@ -924,7 +961,7 @@ export default function EventsIndex({
                                                     type="date"
                                                     value={form.data.event_date}
                                                     onChange={(e) => form.setData('event_date', e.target.value)}
-                                                    className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition"
+                                                    className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-[#1AC13B] transition"
                                                 />
                                             </div>
                                         </div>
@@ -938,10 +975,10 @@ export default function EventsIndex({
                                                 <MapPin className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
                                                 <input
                                                     type="text"
-                                                    placeholder="Contoh: Auditorium Damar, Gd. Pelatihan Telkom University / Hybrid Zoom"
+                                                    placeholder="Masukkan nama gedung, ruangan, atau link hybrid..."
                                                     value={form.data.location}
                                                     onChange={(e) => form.setData('location', e.target.value)}
-                                                    className="w-full pl-10 pr-4 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition"
+                                                    className="w-full pl-10 pr-4 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-[#1AC13B] transition"
                                                 />
                                             </div>
                                             {form.errors.location && <p className="text-xs text-rose-500 mt-1">{form.errors.location}</p>}
@@ -960,10 +997,10 @@ export default function EventsIndex({
                                                 </label>
                                                 <input
                                                     type="text"
-                                                    placeholder="Contoh: Prof. Dr. Ir. H. Ahmad Dahlan, M.Eng."
+                                                    placeholder="Masukkan nama lengkap pembicara utama..."
                                                     value={form.data.speaker_name}
                                                     onChange={(e) => form.setData('speaker_name', e.target.value)}
-                                                    className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition"
+                                                    className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-[#1AC13B] transition"
                                                 />
                                             </div>
 
@@ -973,10 +1010,10 @@ export default function EventsIndex({
                                                 </label>
                                                 <input
                                                     type="text"
-                                                    placeholder="Contoh: Senior Principal Researcher, Automation Lab"
+                                                    placeholder="Masukkan gelar atau jabatan pembicara..."
                                                     value={form.data.speaker_title}
                                                     onChange={(e) => form.setData('speaker_title', e.target.value)}
-                                                    className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition"
+                                                    className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-[#1AC13B] transition"
                                                 />
                                             </div>
                                         </div>
@@ -991,9 +1028,9 @@ export default function EventsIndex({
                                                     <button
                                                         type="button"
                                                         onClick={() => setImageInputType('preset')}
-                                                        className={`px-2.5 py-1 rounded text-xs font-semibold transition ${
+                                                        className={`px-2.5 py-1 rounded text-xs font-semibold transition cursor-pointer ${
                                                             imageInputType === 'preset'
-                                                                ? 'bg-white dark:bg-slate-700 text-emerald-600 dark:text-emerald-400 shadow-sm'
+                                                                ? 'bg-white dark:bg-slate-700 text-[#107E27] dark:text-[#3FD27B] shadow-xs'
                                                                 : 'text-slate-500 hover:text-slate-900'
                                                         }`}
                                                     >
@@ -1002,9 +1039,9 @@ export default function EventsIndex({
                                                     <button
                                                         type="button"
                                                         onClick={() => setImageInputType('upload')}
-                                                        className={`px-2.5 py-1 rounded text-xs font-semibold transition ${
+                                                        className={`px-2.5 py-1 rounded text-xs font-semibold transition cursor-pointer ${
                                                             imageInputType === 'upload'
-                                                                ? 'bg-white dark:bg-slate-700 text-emerald-600 dark:text-emerald-400 shadow-sm'
+                                                                ? 'bg-white dark:bg-slate-700 text-[#107E27] dark:text-[#3FD27B] shadow-xs'
                                                                 : 'text-slate-500 hover:text-slate-900'
                                                         }`}
                                                     >
@@ -1013,9 +1050,9 @@ export default function EventsIndex({
                                                     <button
                                                         type="button"
                                                         onClick={() => setImageInputType('url')}
-                                                        className={`px-2.5 py-1 rounded text-xs font-semibold transition ${
+                                                        className={`px-2.5 py-1 rounded text-xs font-semibold transition cursor-pointer ${
                                                             imageInputType === 'url'
-                                                                ? 'bg-white dark:bg-slate-700 text-emerald-600 dark:text-emerald-400 shadow-sm'
+                                                                ? 'bg-white dark:bg-slate-700 text-[#107E27] dark:text-[#3FD27B] shadow-xs'
                                                                 : 'text-slate-500 hover:text-slate-900'
                                                         }`}
                                                     >
@@ -1026,7 +1063,7 @@ export default function EventsIndex({
 
                                             {/* Gallery Presets */}
                                             {imageInputType === 'preset' && (
-                                                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 max-h-56 overflow-y-auto p-1 scrollbar-thin">
+                                                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 max-h-56 overflow-y-auto p-1 no-scrollbar">
                                                     {POSTER_PRESETS.map((preset) => (
                                                         <div
                                                             key={preset.url}
@@ -1036,7 +1073,7 @@ export default function EventsIndex({
                                                             }}
                                                             className={`cursor-pointer group rounded-xl overflow-hidden border-2 transition relative ${
                                                                 form.data.image_url === preset.url
-                                                                    ? 'border-emerald-500 ring-2 ring-emerald-500/20'
+                                                                    ? 'border-[#1AC13B] ring-2 ring-[#1AC13B]/20'
                                                                     : 'border-slate-200 dark:border-slate-800 hover:border-slate-400'
                                                             }`}
                                                         >
@@ -1057,7 +1094,7 @@ export default function EventsIndex({
 
                                             {/* File Upload Input */}
                                             {imageInputType === 'upload' && (
-                                                <div className="border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-2xl p-6 text-center hover:border-emerald-500 transition">
+                                                <div className="border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-2xl p-6 text-center hover:border-[#1AC13B] transition">
                                                     <Upload className="w-8 h-8 mx-auto text-slate-400 mb-2" />
                                                     <p className="text-xs font-semibold text-slate-700 dark:text-slate-300">
                                                         Pilih file poster (JPG, PNG, WebP) maks 3MB
@@ -1066,7 +1103,7 @@ export default function EventsIndex({
                                                         type="file"
                                                         accept="image/*"
                                                         onChange={handleFileChange}
-                                                        className="mt-3 block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 dark:file:bg-emerald-950 dark:file:text-emerald-400 cursor-pointer"
+                                                        className="mt-3 block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-[#EDFBF1] file:text-[#107E27] hover:file:bg-[#EDFBF1]/80 dark:file:bg-[#10381C] dark:file:text-[#3FD27B] cursor-pointer"
                                                     />
                                                 </div>
                                             )}
@@ -1082,7 +1119,7 @@ export default function EventsIndex({
                                                             form.setData('image_url', e.target.value);
                                                             setImagePreview(e.target.value);
                                                         }}
-                                                        className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition"
+                                                        className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-[#1AC13B] transition"
                                                     />
                                                 </div>
                                             )}
@@ -1120,9 +1157,9 @@ export default function EventsIndex({
                                                 <button
                                                     type="button"
                                                     onClick={() => setActiveLangTab('ID')}
-                                                    className={`px-3 py-1 rounded text-xs font-bold transition ${
+                                                    className={`px-3 py-1 rounded text-xs font-bold transition cursor-pointer ${
                                                         activeLangTab === 'ID'
-                                                            ? 'bg-emerald-600 text-white shadow-sm'
+                                                            ? 'bg-[#1AC13B] text-white shadow-xs'
                                                             : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
                                                     }`}
                                                 >
@@ -1131,9 +1168,9 @@ export default function EventsIndex({
                                                 <button
                                                     type="button"
                                                     onClick={() => setActiveLangTab('EN')}
-                                                    className={`px-3 py-1 rounded text-xs font-bold transition ${
+                                                    className={`px-3 py-1 rounded text-xs font-bold transition cursor-pointer ${
                                                         activeLangTab === 'EN'
-                                                            ? 'bg-emerald-600 text-white shadow-sm'
+                                                            ? 'bg-[#1AC13B] text-white shadow-xs'
                                                             : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
                                                     }`}
                                                 >
@@ -1150,10 +1187,10 @@ export default function EventsIndex({
                                                 </label>
                                                 <input
                                                     type="text"
-                                                    placeholder="Contoh: Simposium Nasional Otomasi Berkelanjutan & Ekosistem Cyber-Physical"
+                                                    placeholder="Masukkan judul agenda atau simposium ilmiah..."
                                                     value={form.data.title_id}
                                                     onChange={(e) => form.setData('title_id', e.target.value)}
-                                                    className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition font-semibold"
+                                                    className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-[#1AC13B] transition font-semibold"
                                                 />
                                             </div>
                                         ) : (
@@ -1163,10 +1200,10 @@ export default function EventsIndex({
                                                 </label>
                                                 <input
                                                     type="text"
-                                                    placeholder="Example: National Symposium on Sustainable Automation & Cyber-Physical Systems"
+                                                    placeholder="Enter symposium or event title in English..."
                                                     value={form.data.title}
                                                     onChange={(e) => form.setData('title', e.target.value)}
-                                                    className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition font-semibold"
+                                                    className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-[#1AC13B] transition font-semibold"
                                                 />
                                             </div>
                                         )}
@@ -1182,7 +1219,7 @@ export default function EventsIndex({
                                                     placeholder="Jelaskan tujuan, topik pembahasan, target peserta, dan keluaran yang diharapkan dari simposium/workshop ini..."
                                                     value={form.data.description_id}
                                                     onChange={(e) => form.setData('description_id', e.target.value)}
-                                                    className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition"
+                                                    className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-[#1AC13B] transition"
                                                 />
                                             </div>
                                         ) : (
@@ -1195,7 +1232,7 @@ export default function EventsIndex({
                                                     placeholder="Explain the objectives, core topics, target audience, and expected takeaways..."
                                                     value={form.data.description}
                                                     onChange={(e) => form.setData('description', e.target.value)}
-                                                    className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition"
+                                                    className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-[#1AC13B] transition"
                                                 />
                                             </div>
                                         )}
@@ -1209,17 +1246,17 @@ export default function EventsIndex({
                                                 </label>
                                                 <input
                                                     type="text"
-                                                    placeholder="Contoh: https://bit.ly/STAS-Symposium atau #contact"
+                                                    placeholder="Masukkan tautan pendaftaran acara..."
                                                     value={form.data.registration_link}
                                                     onChange={(e) => form.setData('registration_link', e.target.value)}
-                                                    className="w-full px-3 py-2 rounded-lg text-xs bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500/20 transition"
+                                                    className="w-full px-3 py-2 rounded-lg text-xs bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-[#1AC13B] transition"
                                                 />
                                                 <input
                                                     type="text"
                                                     placeholder="Label Tombol: Daftar Sekarang"
                                                     value={form.data.primary_action_text}
                                                     onChange={(e) => form.setData('primary_action_text', e.target.value)}
-                                                    className="w-full px-3 py-2 rounded-lg text-xs bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500/20 transition"
+                                                    className="w-full px-3 py-2 rounded-lg text-xs bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-[#1AC13B] transition"
                                                 />
                                             </div>
 
@@ -1230,17 +1267,17 @@ export default function EventsIndex({
                                                 </label>
                                                 <input
                                                     type="text"
-                                                    placeholder="Contoh: https://stasrg.org/docs/TOR-Symposium.pdf"
+                                                    placeholder="Masukkan tautan unduh brosur PDF..."
                                                     value={form.data.brochure_url}
                                                     onChange={(e) => form.setData('brochure_url', e.target.value)}
-                                                    className="w-full px-3 py-2 rounded-lg text-xs bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500/20 transition"
+                                                    className="w-full px-3 py-2 rounded-lg text-xs bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-[#1AC13B] transition"
                                                 />
                                                 <input
                                                     type="text"
                                                     placeholder="Label Tombol: Unduh Brosur"
                                                     value={form.data.secondary_action_text}
                                                     onChange={(e) => form.setData('secondary_action_text', e.target.value)}
-                                                    className="w-full px-3 py-2 rounded-lg text-xs bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500/20 transition"
+                                                    className="w-full px-3 py-2 rounded-lg text-xs bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-[#1AC13B] transition"
                                                 />
                                             </div>
                                         </div>
@@ -1301,7 +1338,7 @@ export default function EventsIndex({
                                                 min={1}
                                                 value={form.data.order}
                                                 onChange={(e) => form.setData('order', parseInt(e.target.value) || 1)}
-                                                className="w-32 px-3.5 py-2.5 rounded-xl text-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition font-bold"
+                                                className="w-32 px-3.5 py-2.5 rounded-xl text-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-[#1AC13B] transition font-bold"
                                             />
                                             <p className="text-xs text-slate-500 mt-1">
                                                 Agenda dengan urutan terkecil (misal 1, 2) akan tampil di posisi awal kalender.
@@ -1319,14 +1356,14 @@ export default function EventsIndex({
                                         <button
                                             type="button"
                                             onClick={() => setIsModalOpen(false)}
-                                            className="px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 font-semibold text-xs transition"
+                                            className="px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 font-semibold text-xs transition cursor-pointer"
                                         >
                                             Batal
                                         </button>
                                         <button
                                             type="submit"
                                             disabled={form.processing}
-                                            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-lg shadow-emerald-600/20 transition disabled:opacity-50"
+                                            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#1AC13B] hover:bg-[#12A02E] text-white font-bold text-xs shadow-xs transition disabled:opacity-50 cursor-pointer"
                                         >
                                             {form.processing ? (
                                                 'Menyimpan...'
@@ -1350,7 +1387,7 @@ export default function EventsIndex({
                 onClose={() => setDeleteModalOpen(false)}
                 onConfirm={executeDelete}
                 title="Hapus Agenda Kegiatan?"
-                description={`Apakah Anda yakin ingin menghapus agenda "${eventToDelete?.title_id || eventToDelete?.title}"? Tindakan ini tidak dapat dibatalkan.`}
+                message={`Apakah Anda yakin ingin menghapus agenda "${eventToDelete?.title_id || eventToDelete?.title}"? Tindakan ini tidak dapat dibatalkan.`}
                 confirmText="Ya, Hapus Agenda"
                 cancelText="Batal"
                 type="danger"

@@ -12,6 +12,7 @@ import {
     Edit3,
     Trash2,
     CheckCircle2,
+    XCircle,
     AlertCircle,
     X,
     ExternalLink,
@@ -233,7 +234,7 @@ export default function DomainsIndex({
 
     return (
         <AdminLayout
-            title={isEn ? 'Research Focus Domains' : 'Kelola Domain Riset'}
+            title={isEn ? 'Research Areas' : 'Kelola Bidang Riset'}
             siteConfig={siteConfig}
         >
             <div className="space-y-6">
@@ -242,15 +243,15 @@ export default function DomainsIndex({
                     <div className="space-y-1.5">
                         <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-[#EDFBF1] dark:bg-[#10381C] text-[#107E27] dark:text-[#3FD27B] text-xs font-bold">
                             <Layers className="w-3.5 h-3.5" />
-                            <span>{isEn ? 'Multidisciplinary Scientific Clusters' : 'Klaster Riset Multidisiplin'}</span>
+                            <span>{isEn ? 'Research Focus Areas' : 'Bidang Riset Unggulan'}</span>
                         </div>
                         <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-                            {isEn ? 'Research Focus Domains' : 'Domain Ilmiah Multidisiplin'}
+                            {isEn ? 'Research Areas & Focus' : 'Bidang Riset & Fokus Keilmuan'}
                         </h2>
                         <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 max-w-2xl leading-relaxed">
                             {isEn
-                                ? 'Configure the specialized research divisions driving sustainable engineering, smart manufacturing, and applied industrial innovation at CoE STAS-RG.'
-                                : 'Kelola divisi riset terspesialisasi yang mendorong inovasi rekayasa berkelanjutan, manufaktur cerdas, dan komputasi industri di CoE STAS-RG.'}
+                                ? 'Configure the research focus areas and specialized divisions driving sustainable engineering, smart manufacturing, and applied innovation at CoE STAS-RG.'
+                                : 'Kelola fokus bidang riset dan inovasi rekayasa berkelanjutan, manufaktur cerdas, dan teknologi terapan di CoE STAS-RG.'}
                         </p>
                     </div>
 
@@ -268,7 +269,7 @@ export default function DomainsIndex({
                             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#1AC13B] hover:bg-[#16a331] text-white text-xs font-bold transition-all shadow-none cursor-pointer border-0"
                         >
                             <Plus className="w-4 h-4" />
-                            <span>{isEn ? 'Add Focus Domain' : 'Tambah Domain Baru'}</span>
+                            <span>{isEn ? 'Add Research Area' : 'Tambah Bidang Riset'}</span>
                         </button>
                     </div>
                 </div>
@@ -377,116 +378,146 @@ export default function DomainsIndex({
                     </div>
                 </div>
 
-                {/* 4. Domain Cards Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-                    {domains.map((domain, index) => (
-                        <motion.div
-                            key={domain.id}
-                            layout
-                            initial={{ opacity: 0, y: 15 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.2, delay: index * 0.03 }}
-                            className={`p-5 rounded-2xl bg-white dark:bg-slate-900 border transition-all flex flex-col justify-between group ${
-                                domain.is_active
-                                    ? 'border-slate-200 dark:border-slate-800 hover:border-[#1AC13B]/70'
-                                    : 'border-slate-200/50 dark:border-slate-800/50 opacity-60 bg-slate-50/50 dark:bg-slate-900/40'
-                            }`}
-                        >
-                            <div className="space-y-3.5">
-                                {/* Top Badges & Actions */}
-                                <div className="flex items-center justify-between gap-2">
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-9 h-9 rounded-xl bg-[#EDFBF1] dark:bg-[#10381C] text-[#107E27] dark:text-[#3FD27B] flex items-center justify-center font-bold text-xs shrink-0 group-hover:bg-[#1AC13B] group-hover:text-white transition-colors">
-                                            <IconHelper name={domain.icon} className="w-4 h-4" />
+                {/* 4. Domain Cards Grid or Empty State */}
+                {domains.length === 0 ? (
+                    <div className="p-12 text-center rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-3">
+                        <img
+                            src="/assets/icon/errors/notfound.png"
+                            alt="Tidak ada data"
+                            className="w-28 sm:w-36 h-auto object-contain mx-auto select-none pointer-events-none drop-shadow-xs mb-2"
+                            onError={(e) => {
+                                (e.target as HTMLImageElement).src = '/assets/icon/errors/notfound.png';
+                            }}
+                        />
+                        <h3 className="text-base font-bold text-slate-800 dark:text-slate-200">
+                            {isEn ? 'No research areas found' : 'Tidak ada bidang riset ditemukan'}
+                        </h3>
+                        <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                            {isEn
+                                ? 'Try changing your search keywords or status filter, or create a new research area.'
+                                : 'Coba ubah kata kunci pencarian atau filter status, atau tambahkan bidang riset baru.'}
+                        </p>
+                        <div>
+                            <button
+                                onClick={openCreateModal}
+                                className="mt-2 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#1AC13B] hover:bg-[#12A02E] text-white text-xs font-bold transition-colors cursor-pointer border-0"
+                            >
+                                <Plus className="w-4 h-4" />
+                                <span>{isEn ? 'Add Research Area' : 'Tambah Bidang Riset'}</span>
+                            </button>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+                        {domains.map((domain, index) => (
+                            <motion.div
+                                key={domain.id}
+                                layout
+                                initial={{ opacity: 0, y: 15 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.2, delay: index * 0.03 }}
+                                className={`p-5 rounded-2xl bg-white dark:bg-slate-900 border transition-all flex flex-col justify-between group ${
+                                    domain.is_active
+                                        ? 'border-slate-200 dark:border-slate-800 hover:border-[#1AC13B]/70'
+                                        : 'border-slate-200/50 dark:border-slate-800/50 opacity-60 bg-slate-50/50 dark:bg-slate-900/40'
+                                }`}
+                            >
+                                <div className="space-y-3.5">
+                                    {/* Top Badges & Actions */}
+                                    <div className="flex items-center justify-between gap-2">
+                                        <div className="flex items-center gap-2">
+                                            <div className="w-9 h-9 rounded-xl bg-[#EDFBF1] dark:bg-[#10381C] text-[#107E27] dark:text-[#3FD27B] flex items-center justify-center font-bold text-xs shrink-0 group-hover:bg-[#1AC13B] group-hover:text-white transition-colors">
+                                                <IconHelper name={domain.icon} className="w-4 h-4" />
+                                            </div>
+                                            <div>
+                                                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
+                                                    {domain.domain_number}
+                                                </span>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
-                                                {domain.domain_number}
-                                            </span>
-                                        </div>
+
+                                        {/* Active Toggle Switch */}
+                                        <button
+                                            onClick={() => handleToggleStatus(domain)}
+                                            title={domain.is_active ? 'Click to disable' : 'Click to enable'}
+                                            className={`px-2 py-0.5 rounded-full text-[10px] font-bold transition-colors cursor-pointer border-0 flex items-center gap-1 ${
+                                                domain.is_active
+                                                    ? 'bg-[#EDFBF1] dark:bg-[#10381C] text-[#107E27] dark:text-[#3FD27B]'
+                                                    : 'bg-slate-100 dark:bg-slate-800 text-slate-400'
+                                            }`}
+                                        >
+                                            <span className={`w-1.5 h-1.5 rounded-full ${domain.is_active ? 'bg-[#1AC13B]' : 'bg-slate-400'}`} />
+                                            <span>{domain.is_active ? (isEn ? 'Active' : 'Aktif') : (isEn ? 'Draft' : 'Draft')}</span>
+                                        </button>
                                     </div>
 
-                                    {/* Active Toggle Switch */}
-                                    <button
-                                        onClick={() => handleToggleStatus(domain)}
-                                        title={domain.is_active ? 'Click to disable' : 'Click to enable'}
-                                        className={`px-2 py-0.5 rounded-full text-[10px] font-bold transition-colors cursor-pointer border-0 flex items-center gap-1 ${
-                                            domain.is_active
-                                                ? 'bg-[#EDFBF1] dark:bg-[#10381C] text-[#107E27] dark:text-[#3FD27B]'
-                                                : 'bg-slate-100 dark:bg-slate-800 text-slate-400'
-                                        }`}
-                                    >
-                                        <span className={`w-1.5 h-1.5 rounded-full ${domain.is_active ? 'bg-[#1AC13B]' : 'bg-slate-400'}`} />
-                                        <span>{domain.is_active ? (isEn ? 'Active' : 'Aktif') : (isEn ? 'Draft' : 'Draft')}</span>
-                                    </button>
-                                </div>
-
-                                {/* Titles (ID & EN) */}
-                                <div className="space-y-1">
-                                    <div className="text-xs font-bold text-slate-900 dark:text-white line-clamp-2 leading-snug">
-                                        {domain.title_id || domain.title}
+                                    {/* Titles (ID & EN) */}
+                                    <div className="space-y-1">
+                                        <div className="text-xs font-bold text-slate-900 dark:text-white line-clamp-2 leading-snug">
+                                            {domain.title_id || domain.title}
+                                        </div>
+                                        {domain.title_id && domain.title !== domain.title_id && (
+                                            <div className="text-[11px] text-slate-400 dark:text-slate-500 italic line-clamp-1">
+                                                EN: {domain.title}
+                                            </div>
+                                        )}
                                     </div>
-                                    {domain.title_id && domain.title !== domain.title_id && (
-                                        <div className="text-[11px] text-slate-400 dark:text-slate-500 italic line-clamp-1">
-                                            EN: {domain.title}
+
+                                    {/* Summary */}
+                                    <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-3 leading-relaxed">
+                                        {domain.summary_id || domain.summary}
+                                    </p>
+
+                                    {/* Focus Areas Tag Pills */}
+                                    {domain.focus_areas && domain.focus_areas.length > 0 && (
+                                        <div className="flex flex-wrap gap-1 pt-1">
+                                            {domain.focus_areas.map((tag, tIdx) => (
+                                                <span
+                                                    key={tIdx}
+                                                    className="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800/80 text-[10px] font-medium text-slate-600 dark:text-slate-300"
+                                                >
+                                                    {tag}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    )}
+
+                                    {/* Lead Researcher */}
+                                    {domain.lead_researcher && (
+                                        <div className="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1.5 pt-1 border-t border-slate-100 dark:border-slate-800/80">
+                                            <UserCheck className="w-3.5 h-3.5 text-[#107E27] dark:text-[#1AC13B] shrink-0" />
+                                            <span className="truncate">{domain.lead_researcher}</span>
                                         </div>
                                     )}
                                 </div>
 
-                                {/* Summary */}
-                                <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-3 leading-relaxed">
-                                    {domain.summary_id || domain.summary}
-                                </p>
+                                {/* Bottom Card Actions */}
+                                <div className="pt-4 mt-4 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
+                                    <span className="text-[10px] text-slate-400 font-mono">
+                                        #{domain.order} • /{domain.slug}
+                                    </span>
 
-                                {/* Focus Areas Tag Pills */}
-                                {domain.focus_areas && domain.focus_areas.length > 0 && (
-                                    <div className="flex flex-wrap gap-1 pt-1">
-                                        {domain.focus_areas.map((tag, tIdx) => (
-                                            <span
-                                                key={tIdx}
-                                                className="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800/80 text-[10px] font-medium text-slate-600 dark:text-slate-300"
-                                            >
-                                                {tag}
-                                            </span>
-                                        ))}
+                                    <div className="flex items-center gap-1">
+                                        <button
+                                            onClick={() => openEditModal(domain)}
+                                            className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer border-0"
+                                            title={isEn ? 'Edit Domain' : 'Ubah Domain'}
+                                        >
+                                            <Edit3 className="w-3.5 h-3.5" />
+                                        </button>
+                                        <button
+                                            onClick={() => setDomainToDelete(domain)}
+                                            className="p-1.5 rounded-lg text-red-500 hover:text-red-700 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors cursor-pointer border-0"
+                                            title={isEn ? 'Delete Domain' : 'Hapus Domain'}
+                                        >
+                                            <Trash2 className="w-3.5 h-3.5" />
+                                        </button>
                                     </div>
-                                )}
-
-                                {/* Lead Researcher */}
-                                {domain.lead_researcher && (
-                                    <div className="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1.5 pt-1 border-t border-slate-100 dark:border-slate-800/80">
-                                        <UserCheck className="w-3.5 h-3.5 text-[#107E27] dark:text-[#1AC13B] shrink-0" />
-                                        <span className="truncate">{domain.lead_researcher}</span>
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Bottom Card Actions */}
-                            <div className="pt-4 mt-4 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
-                                <span className="text-[10px] text-slate-400 font-mono">
-                                    #{domain.order} • /{domain.slug}
-                                </span>
-
-                                <div className="flex items-center gap-1">
-                                    <button
-                                        onClick={() => openEditModal(domain)}
-                                        className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer border-0"
-                                        title={isEn ? 'Edit Domain' : 'Ubah Domain'}
-                                    >
-                                        <Edit3 className="w-3.5 h-3.5" />
-                                    </button>
-                                    <button
-                                        onClick={() => setDomainToDelete(domain)}
-                                        className="p-1.5 rounded-lg text-red-500 hover:text-red-700 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors cursor-pointer border-0"
-                                        title={isEn ? 'Delete Domain' : 'Hapus Domain'}
-                                    >
-                                        <Trash2 className="w-3.5 h-3.5" />
-                                    </button>
                                 </div>
-                            </div>
-                        </motion.div>
-                    ))}
-                </div>
+                            </motion.div>
+                        ))}
+                    </div>
+                )}
 
                 {/* 5. Create / Edit Modal Dialog */}
                 <AnimatePresence>
@@ -512,11 +543,11 @@ export default function DomainsIndex({
                                     <div className="space-y-1">
                                         <h3 className="text-lg font-extrabold text-slate-900 dark:text-white">
                                             {editingDomain
-                                                ? (isEn ? 'Edit Research Domain' : 'Ubah Domain Riset')
-                                                : (isEn ? 'Create New Research Domain' : 'Tambah Domain Riset Baru')}
+                                                ? (isEn ? 'Edit Research Area' : 'Ubah Bidang Riset')
+                                                : (isEn ? 'Create New Research Area' : 'Tambah Bidang Riset Baru')}
                                         </h3>
                                         <p className="text-xs text-slate-500">
-                                            {isEn ? 'Configure multidisciplinary scientific focus and metadata.' : 'Konfigurasi informasi ilmiah, ikon, dan fokus riset domain.'}
+                                            {isEn ? 'Configure research focus details, icon, and topics.' : 'Atur informasi fokus bidang riset, topik unggulan, dan ikon.'}
                                         </p>
                                     </div>
                                     <button
@@ -547,14 +578,14 @@ export default function DomainsIndex({
                                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
                                         <div>
                                             <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
-                                                {isEn ? 'Domain Number' : 'Nomor Domain'} *
+                                                {isEn ? 'Area Code / Number' : 'Kode / Nomor Urut'} *
                                             </label>
                                             <input
                                                 type="text"
                                                 required
                                                 value={form.data.domain_number}
                                                 onChange={(e) => form.setData('domain_number', e.target.value)}
-                                                placeholder="01 / DOMAIN"
+                                                placeholder="01 / RISET"
                                                 className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:border-[#1AC13B]"
                                             />
                                             {form.errors.domain_number && (
@@ -678,7 +709,7 @@ export default function DomainsIndex({
                                                         type="text"
                                                         value={form.data.title_id}
                                                         onChange={(e) => form.setData('title_id', e.target.value)}
-                                                        placeholder="contoh: Teknologi Berkelanjutan & Sistem Hijau"
+                                                        placeholder="Masukkan judul bidang riset..."
                                                         className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-900 dark:text-white focus:outline-none focus:border-[#1AC13B]"
                                                     />
                                                     {(form.errors.title_id || form.errors.title) && (
@@ -696,7 +727,7 @@ export default function DomainsIndex({
                                                         rows={3}
                                                         value={form.data.summary_id}
                                                         onChange={(e) => form.setData('summary_id', e.target.value)}
-                                                        placeholder="contoh: Kerangka eko-efisiensi, analisis siklus hidup karbon, dan material sirkular."
+                                                        placeholder="Masukkan ringkasan dan cakupan bidang riset..."
                                                         className="w-full px-3.5 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#1AC13B]"
                                                     />
                                                     {(form.errors.summary_id || form.errors.summary) && (
@@ -717,7 +748,7 @@ export default function DomainsIndex({
                                                         type="text"
                                                         value={form.data.title}
                                                         onChange={(e) => form.setData('title', e.target.value)}
-                                                        placeholder="e.g. Sustainable Technology & Green Systems"
+                                                        placeholder="Enter research domain title in English..."
                                                         className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-900 dark:text-white focus:outline-none focus:border-[#1AC13B]"
                                                     />
                                                     {(form.errors.title || form.errors.title_id) && (
@@ -735,7 +766,7 @@ export default function DomainsIndex({
                                                         rows={3}
                                                         value={form.data.summary}
                                                         onChange={(e) => form.setData('summary', e.target.value)}
-                                                        placeholder="e.g. Eco-efficiency frameworks, carbon lifecycle analysis, and circular materials development."
+                                                        placeholder="Enter research summary and scope in English..."
                                                         className="w-full px-3.5 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#1AC13B]"
                                                     />
                                                     {(form.errors.summary || form.errors.summary_id) && (
@@ -759,7 +790,7 @@ export default function DomainsIndex({
                                                 value={newTagInput}
                                                 onChange={(e) => setNewTagInput(e.target.value)}
                                                 onKeyDown={handleAddFocusTag}
-                                                placeholder={isEn ? 'Type focus topic (e.g. Digital Twins) and press Add' : 'Ketik sub-topik (contoh: Analisis Siklus Karbon) lalu tekan Tambah'}
+                                                placeholder={isEn ? 'Enter focus topic and press Add' : 'Masukkan sub-topik lalu tekan Tambah'}
                                                 className="flex-1 px-3.5 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#1AC13B]"
                                             />
                                             <button
@@ -806,7 +837,7 @@ export default function DomainsIndex({
                                                 type="text"
                                                 value={form.data.lead_researcher}
                                                 onChange={(e) => form.setData('lead_researcher', e.target.value)}
-                                                placeholder="e.g. Dr. Ir. Wahyu H., M.T."
+                                                placeholder={isEn ? 'Enter lead researcher or coordinator name...' : 'Masukkan nama ketua peneliti atau koordinator...'}
                                                 className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#1AC13B]"
                                             />
                                         </div>

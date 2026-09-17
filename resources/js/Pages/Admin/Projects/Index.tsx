@@ -252,7 +252,7 @@ export default function ProjectsIndex({
 
     return (
         <AdminLayout
-            title={isEn ? 'Featured Research Projects' : 'Kelola Proyek Riset Unggulan'}
+            title={isEn ? 'Research Projects' : 'Kelola Proyek Riset'}
             siteConfig={siteConfig}
         >
             <div className="space-y-6">
@@ -261,15 +261,15 @@ export default function ProjectsIndex({
                     <div className="space-y-1.5">
                         <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-[#EDFBF1] dark:bg-[#10381C] text-[#107E27] dark:text-[#3FD27B] text-xs font-bold">
                             <Briefcase className="w-3.5 h-3.5" />
-                            <span>{isEn ? 'Flagship Industrial Initiatives' : 'Inisiatif Riset Unggulan & Kolaborasi'}</span>
+                            <span>{isEn ? 'Research Projects' : 'Portofolio Proyek Riset'}</span>
                         </div>
                         <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-                            {isEn ? 'Featured Research Projects' : 'Proyek Riset Unggulan'}
+                            {isEn ? 'Research & Innovation Projects' : 'Proyek Riset & Inovasi'}
                         </h2>
                         <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 max-w-2xl leading-relaxed">
                             {isEn
-                                ? 'Manage strategic research initiatives, industry case studies, and applied technology scale-ups across CoE STAS-RG specialized research laboratories.'
-                                : 'Kelola inisiatif riset strategis, studi kasus kolaborasi industri, dan prototipe teknologi terapan di laboratorium penelitian CoE STAS-RG.'}
+                                ? 'Manage strategic research initiatives, industry case studies, and applied technology implementations at CoE STAS-RG.'
+                                : 'Kelola portofolio proyek riset, studi kasus industri, dan status pengembangan di CoE STAS-RG.'}
                         </p>
                     </div>
 
@@ -287,7 +287,7 @@ export default function ProjectsIndex({
                             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#1AC13B] hover:bg-[#16a331] text-white text-xs font-bold transition-all shadow-none cursor-pointer border-0"
                         >
                             <Plus className="w-4 h-4" />
-                            <span>{isEn ? 'Add Flagship Project' : 'Tambah Proyek Baru'}</span>
+                            <span>{isEn ? 'Add Project' : 'Tambah Proyek Riset'}</span>
                         </button>
                     </div>
                 </div>
@@ -403,167 +403,197 @@ export default function ProjectsIndex({
                     </div>
                 </div>
 
-                {/* 4. Projects Cards Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                    {projects.map((project, index) => (
-                        <motion.div
-                            key={project.id}
-                            layout
-                            initial={{ opacity: 0, y: 15 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.2, delay: index * 0.04 }}
-                            className={`rounded-2xl bg-white dark:bg-slate-900 border transition-all flex flex-col justify-between overflow-hidden group ${
-                                project.is_active
-                                    ? 'border-slate-200 dark:border-slate-800 hover:border-[#1AC13B]/70'
-                                    : 'border-slate-200/50 dark:border-slate-800/50 opacity-60 bg-slate-50/50 dark:bg-slate-900/40'
-                            }`}
-                        >
-                            <div>
-                                {/* Project Thumbnail Image */}
-                                <div className="relative h-44 w-full overflow-hidden bg-slate-100 dark:bg-slate-800">
-                                    <img
-                                        src={project.image_url}
-                                        alt={project.title}
-                                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                        onError={(e) => {
-                                            (e.target as HTMLImageElement).src =
-                                                'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=800&q=80';
-                                        }}
-                                    />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent opacity-80" />
+                {/* 4. Projects Cards Grid or Empty State */}
+                {projects.length === 0 ? (
+                    <div className="p-12 text-center rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-3">
+                        <img
+                            src="/assets/icon/errors/notfound.png"
+                            alt="Tidak ada data"
+                            className="w-28 sm:w-36 h-auto object-contain mx-auto select-none pointer-events-none drop-shadow-xs mb-2"
+                            onError={(e) => {
+                                (e.target as HTMLImageElement).src = '/assets/icon/errors/notfound.png';
+                            }}
+                        />
+                        <h3 className="text-base font-bold text-slate-800 dark:text-slate-200">
+                            {isEn ? 'No research projects found' : 'Tidak ada proyek riset ditemukan'}
+                        </h3>
+                        <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                            {isEn
+                                ? 'Try changing your search keywords, category filter, or register a new research project.'
+                                : 'Coba ubah kata kunci pencarian atau filter kategori, atau tambahkan proyek riset baru.'}
+                        </p>
+                        <div>
+                            <button
+                                onClick={openCreateModal}
+                                className="mt-2 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#1AC13B] hover:bg-[#12A02E] text-white text-xs font-bold transition-colors cursor-pointer border-0"
+                            >
+                                <Plus className="w-4 h-4" />
+                                <span>{isEn ? 'Add Research Project' : 'Tambah Proyek Riset'}</span>
+                            </button>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                        {projects.map((project, index) => (
+                            <motion.div
+                                key={project.id}
+                                layout
+                                initial={{ opacity: 0, y: 15 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.2, delay: index * 0.04 }}
+                                className={`rounded-2xl bg-white dark:bg-slate-900 border transition-all flex flex-col justify-between overflow-hidden group ${
+                                    project.is_active
+                                        ? 'border-slate-200 dark:border-slate-800 hover:border-[#1AC13B]/70'
+                                        : 'border-slate-200/50 dark:border-slate-800/50 opacity-60 bg-slate-50/50 dark:bg-slate-900/40'
+                                }`}
+                            >
+                                <div>
+                                    {/* Project Thumbnail Image */}
+                                    <div className="relative h-44 w-full overflow-hidden bg-slate-100 dark:bg-slate-800">
+                                        <img
+                                            src={project.image_url}
+                                            alt={project.title}
+                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                            onError={(e) => {
+                                                (e.target as HTMLImageElement).src =
+                                                    'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=800&q=80';
+                                            }}
+                                        />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent opacity-80" />
 
-                                    {/* Top Category Badge */}
-                                    <div className="absolute top-3 left-3 flex items-center gap-1.5">
-                                        <span className="px-2.5 py-1 rounded-md bg-white/95 dark:bg-slate-900/95 backdrop-blur-md text-[10px] font-extrabold uppercase tracking-wider text-[#107E27] dark:text-[#3FD27B] border border-slate-200/60 dark:border-slate-800 shadow-xs">
-                                            {project.category_tag}
-                                        </span>
-                                    </div>
-
-                                    {/* Top Right Quick Badges */}
-                                    <div className="absolute top-3 right-3 flex items-center gap-1">
-                                        <button
-                                            type="button"
-                                            onClick={() => handleToggleFeatured(project)}
-                                            title={project.featured ? 'Featured Project' : 'Mark as Featured'}
-                                            className={`p-1.5 rounded-lg backdrop-blur-md transition-colors cursor-pointer border-0 ${
-                                                project.featured
-                                                    ? 'bg-amber-400 text-slate-950'
-                                                    : 'bg-slate-900/60 text-white hover:bg-slate-900/80'
-                                            }`}
-                                        >
-                                            <Star className={`w-3.5 h-3.5 ${project.featured ? 'fill-current' : ''}`} />
-                                        </button>
-
-                                        <button
-                                            type="button"
-                                            onClick={() => handleToggleStatus(project)}
-                                            title={project.is_active ? 'Published' : 'Draft'}
-                                            className={`px-2 py-1 rounded-lg backdrop-blur-md text-[10px] font-bold transition-colors cursor-pointer border-0 ${
-                                                project.is_active
-                                                    ? 'bg-[#1AC13B] text-white'
-                                                    : 'bg-slate-800/80 text-slate-300'
-                                            }`}
-                                        >
-                                            {project.is_active ? (isEn ? 'Live' : 'Aktif') : 'Draft'}
-                                        </button>
-                                    </div>
-
-                                    {/* Bottom Image Overlay Info */}
-                                    <div className="absolute bottom-3 left-3 right-3 text-white text-[11px] font-medium flex items-center justify-between">
-                                        <span className="truncate">{project.category}</span>
-                                        {project.start_year && (
-                                            <span className="shrink-0 text-slate-300 text-[10px] font-mono">
-                                                {project.start_year} - {project.end_year || 'Ongoing'}
+                                        {/* Top Category Badge */}
+                                        <div className="absolute top-3 left-3 flex items-center gap-1.5">
+                                            <span className="px-2.5 py-1 rounded-md bg-white/95 dark:bg-slate-900/95 backdrop-blur-md text-[10px] font-extrabold uppercase tracking-wider text-[#107E27] dark:text-[#3FD27B] border border-slate-200/60 dark:border-slate-800 shadow-xs">
+                                                {project.category_tag}
                                             </span>
-                                        )}
-                                    </div>
-                                </div>
+                                        </div>
 
-                                {/* Content Details */}
-                                <div className="p-5 space-y-3">
-                                    <div className="space-y-1">
-                                        <h3 className="text-sm font-bold text-slate-900 dark:text-white leading-snug line-clamp-2">
-                                            {project.title_id || project.title}
-                                        </h3>
-                                        {project.title_id && project.title !== project.title_id && (
-                                            <div className="text-[11px] text-slate-400 dark:text-slate-500 italic line-clamp-1">
-                                                EN: {project.title}
-                                            </div>
-                                        )}
-                                    </div>
+                                        {/* Top Right Quick Badges */}
+                                        <div className="absolute top-3 right-3 flex items-center gap-1">
+                                            <button
+                                                type="button"
+                                                onClick={() => handleToggleFeatured(project)}
+                                                title={project.featured ? 'Featured Project' : 'Mark as Featured'}
+                                                className={`p-1.5 rounded-lg backdrop-blur-md transition-colors cursor-pointer border-0 ${
+                                                    project.featured
+                                                        ? 'bg-amber-400 text-slate-950'
+                                                        : 'bg-slate-900/60 text-white hover:bg-slate-900/80'
+                                                }`}
+                                            >
+                                                <Star className={`w-3.5 h-3.5 ${project.featured ? 'fill-current' : ''}`} />
+                                            </button>
 
-                                    <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-3 leading-relaxed">
-                                        {project.summary_id || project.summary}
-                                    </p>
+                                            <button
+                                                type="button"
+                                                onClick={() => handleToggleStatus(project)}
+                                                title={project.is_active ? 'Published' : 'Draft'}
+                                                className={`px-2 py-1 rounded-lg backdrop-blur-md text-[10px] font-bold transition-colors cursor-pointer border-0 ${
+                                                    project.is_active
+                                                        ? 'bg-[#1AC13B] text-white'
+                                                        : 'bg-slate-800/80 text-slate-300'
+                                                }`}
+                                            >
+                                                {project.is_active ? (isEn ? 'Live' : 'Aktif') : 'Draft'}
+                                            </button>
+                                        </div>
 
-                                    {/* Tech Stack Tags */}
-                                    {project.tech_stack && project.tech_stack.length > 0 && (
-                                        <div className="flex flex-wrap gap-1 pt-1">
-                                            {project.tech_stack.slice(0, 4).map((tech, tIdx) => (
-                                                <span
-                                                    key={tIdx}
-                                                    className="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-[10px] font-medium text-slate-600 dark:text-slate-300"
-                                                >
-                                                    {tech}
-                                                </span>
-                                            ))}
-                                            {project.tech_stack.length > 4 && (
-                                                <span className="px-1.5 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-[10px] font-semibold text-slate-400">
-                                                    +{project.tech_stack.length - 4}
+                                        {/* Bottom Image Overlay Info */}
+                                        <div className="absolute bottom-3 left-3 right-3 text-white text-[11px] font-medium flex items-center justify-between">
+                                            <span className="truncate">{project.category}</span>
+                                            {project.start_year && (
+                                                <span className="shrink-0 text-slate-300 text-[10px] font-mono">
+                                                    {project.start_year} - {project.end_year || 'Ongoing'}
                                                 </span>
                                             )}
                                         </div>
-                                    )}
-
-                                    {/* Lead Researcher */}
-                                    <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center gap-2 text-xs text-slate-600 dark:text-slate-400">
-                                        <UserCheck className="w-3.5 h-3.5 text-[#107E27] dark:text-[#1AC13B] shrink-0" />
-                                        <span className="truncate font-medium">{project.lead_researcher}</span>
                                     </div>
 
-                                    {project.funding_source && (
-                                        <div className="flex items-center gap-1.5 text-[11px] text-slate-400">
-                                            <Award className="w-3 h-3 text-amber-500 shrink-0" />
-                                            <span className="truncate">{project.funding_source}</span>
+                                    {/* Content Details */}
+                                    <div className="p-5 space-y-3">
+                                        <div className="space-y-1">
+                                            <h3 className="text-sm font-bold text-slate-900 dark:text-white leading-snug line-clamp-2">
+                                                {project.title_id || project.title}
+                                            </h3>
+                                            {project.title_id && project.title !== project.title_id && (
+                                                <div className="text-[11px] text-slate-400 dark:text-slate-500 italic line-clamp-1">
+                                                    EN: {project.title}
+                                                </div>
+                                            )}
                                         </div>
-                                    )}
-                                </div>
-                            </div>
 
-                            {/* Bottom Card Footer Actions */}
-                            <div className="p-4 pt-0 mt-auto border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
-                                <a
-                                    href={project.case_study_url || `/#project-${project.slug}`}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    className="text-[11px] font-bold text-[#107E27] dark:text-[#1AC13B] hover:underline flex items-center gap-1"
-                                >
-                                    <span>{isEn ? 'Case Study' : 'Lihat Studi'}</span>
-                                    <ExternalLink className="w-3 h-3" />
-                                </a>
+                                        <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-3 leading-relaxed">
+                                            {project.summary_id || project.summary}
+                                        </p>
 
-                                <div className="flex items-center gap-1">
-                                    <button
-                                        type="button"
-                                        onClick={() => openEditModal(project)}
-                                        className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer border-0"
-                                        title={isEn ? 'Edit Project' : 'Ubah Proyek'}
-                                    >
-                                        <Edit3 className="w-3.5 h-3.5" />
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => setProjectToDelete(project)}
-                                        className="p-1.5 rounded-lg text-red-500 hover:text-red-700 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors cursor-pointer border-0"
-                                        title={isEn ? 'Delete Project' : 'Hapus Proyek'}
-                                    >
-                                        <Trash2 className="w-3.5 h-3.5" />
-                                    </button>
+                                        {/* Tech Stack Tags */}
+                                        {project.tech_stack && project.tech_stack.length > 0 && (
+                                            <div className="flex flex-wrap gap-1 pt-1">
+                                                {project.tech_stack.slice(0, 4).map((tech, tIdx) => (
+                                                    <span
+                                                        key={tIdx}
+                                                        className="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-[10px] font-medium text-slate-600 dark:text-slate-300"
+                                                    >
+                                                        {tech}
+                                                    </span>
+                                                ))}
+                                                {project.tech_stack.length > 4 && (
+                                                    <span className="px-1.5 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-[10px] font-semibold text-slate-400">
+                                                        +{project.tech_stack.length - 4}
+                                                    </span>
+                                                )}
+                                            </div>
+                                        )}
+
+                                        {/* Lead Researcher */}
+                                        <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center gap-2 text-xs text-slate-600 dark:text-slate-400">
+                                            <UserCheck className="w-3.5 h-3.5 text-[#107E27] dark:text-[#1AC13B] shrink-0" />
+                                            <span className="truncate font-medium">{project.lead_researcher}</span>
+                                        </div>
+
+                                        {project.funding_source && (
+                                            <div className="flex items-center gap-1.5 text-[11px] text-slate-400">
+                                                <Award className="w-3 h-3 text-amber-500 shrink-0" />
+                                                <span className="truncate">{project.funding_source}</span>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
-                            </div>
-                        </motion.div>
-                    ))}
-                </div>
+
+                                {/* Bottom Card Footer Actions */}
+                                <div className="p-4 pt-0 mt-auto border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
+                                    <a
+                                        href={project.case_study_url || `/#project-${project.slug}`}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="text-[11px] font-bold text-[#107E27] dark:text-[#1AC13B] hover:underline flex items-center gap-1"
+                                    >
+                                        <span>{isEn ? 'Case Study' : 'Lihat Studi'}</span>
+                                        <ExternalLink className="w-3 h-3" />
+                                    </a>
+
+                                    <div className="flex items-center gap-1">
+                                        <button
+                                            type="button"
+                                            onClick={() => openEditModal(project)}
+                                            className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer border-0"
+                                            title={isEn ? 'Edit Project' : 'Ubah Proyek'}
+                                        >
+                                            <Edit3 className="w-3.5 h-3.5" />
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => setProjectToDelete(project)}
+                                            className="p-1.5 rounded-lg text-red-500 hover:text-red-700 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors cursor-pointer border-0"
+                                            title={isEn ? 'Delete Project' : 'Hapus Proyek'}
+                                        >
+                                            <Trash2 className="w-3.5 h-3.5" />
+                                        </button>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        ))}
+                    </div>
+                )}
 
                 {/* 5. Create / Edit Project Modal Dialog */}
                 <AnimatePresence>
@@ -619,7 +649,7 @@ export default function ProjectsIndex({
                                                 required
                                                 value={form.data.category}
                                                 onChange={(e) => form.setData('category', e.target.value)}
-                                                placeholder="e.g. Supply Chain, Sustainable Energy, Smart Manufacturing"
+                                                placeholder={isEn ? 'Enter project category...' : 'Masukkan kategori proyek riset...'}
                                                 className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-900 dark:text-white focus:outline-none focus:border-[#1AC13B]"
                                             />
                                         </div>
@@ -633,7 +663,7 @@ export default function ProjectsIndex({
                                                 required
                                                 value={form.data.category_tag}
                                                 onChange={(e) => form.setData('category_tag', e.target.value)}
-                                                placeholder="e.g. AI & LOGISTICS, RENEWABLE ENERGY, SMART FACTORY"
+                                                placeholder={isEn ? 'Enter uppercase badge label...' : 'Masukkan label badge huruf kapital...'}
                                                 className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold uppercase text-slate-900 dark:text-white focus:outline-none focus:border-[#1AC13B]"
                                             />
                                         </div>
@@ -686,7 +716,7 @@ export default function ProjectsIndex({
                                                         required
                                                         value={form.data.title_id}
                                                         onChange={(e) => form.setData('title_id', e.target.value)}
-                                                        placeholder="contoh: Logistik Armada Otonom & Optimasi Biaya Prediktif"
+                                                        placeholder="Masukkan judul proyek riset..."
                                                         className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-900 dark:text-white focus:outline-none focus:border-[#1AC13B]"
                                                     />
                                                 </div>
@@ -700,7 +730,7 @@ export default function ProjectsIndex({
                                                         required
                                                         value={form.data.summary_id}
                                                         onChange={(e) => form.setData('summary_id', e.target.value)}
-                                                        placeholder="contoh: Kerangka kerja optimasi terintegrasi yang menggabungkan heuristik perutean dan deep reinforcement learning untuk jaringan pengiriman metropolitan berkepadatan tinggi."
+                                                        placeholder="Masukkan ringkasan eksekutif dan cakupan riset..."
                                                         className="w-full px-3.5 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#1AC13B]"
                                                     />
                                                 </div>
@@ -717,7 +747,7 @@ export default function ProjectsIndex({
                                                         required
                                                         value={form.data.title}
                                                         onChange={(e) => form.setData('title', e.target.value)}
-                                                        placeholder="e.g. Autonomous Fleet Logistics & Predictive Cost Optimization"
+                                                        placeholder="Enter research project title in English..."
                                                         className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-900 dark:text-white focus:outline-none focus:border-[#1AC13B]"
                                                     />
                                                 </div>
@@ -731,7 +761,7 @@ export default function ProjectsIndex({
                                                         required
                                                         value={form.data.summary}
                                                         onChange={(e) => form.setData('summary', e.target.value)}
-                                                        placeholder="e.g. Integrated optimization framework combining routing heuristics and deep reinforcement learning for high-density metropolitan delivery networks."
+                                                        placeholder="Enter executive summary and scope in English..."
                                                         className="w-full px-3.5 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#1AC13B]"
                                                     />
                                                 </div>
@@ -750,7 +780,7 @@ export default function ProjectsIndex({
                                                 required
                                                 value={form.data.lead_researcher}
                                                 onChange={(e) => form.setData('lead_researcher', e.target.value)}
-                                                placeholder="e.g. Dr. Ir. Hendra S."
+                                                placeholder={isEn ? 'Enter lead researcher name...' : 'Masukkan nama ketua peneliti...'}
                                                 className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#1AC13B]"
                                             />
                                         </div>
@@ -839,7 +869,7 @@ export default function ProjectsIndex({
                                                 value={newTagInput}
                                                 onChange={(e) => setNewTagInput(e.target.value)}
                                                 onKeyDown={handleAddTechTag}
-                                                placeholder={isEn ? 'Type tech tag (e.g. Deep RL) and press Add' : 'Ketik teknologi (contoh: Deep RL, IoT) lalu tekan Tambah'}
+                                                placeholder={isEn ? 'Enter technology tag and press Add' : 'Masukkan tag teknologi lalu tekan Tambah'}
                                                 className="flex-1 px-3.5 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#1AC13B]"
                                             />
                                             <button
@@ -886,7 +916,7 @@ export default function ProjectsIndex({
                                                 type="text"
                                                 value={form.data.funding_source}
                                                 onChange={(e) => form.setData('funding_source', e.target.value)}
-                                                placeholder="e.g. DIKTI Matching Fund & Transtrack"
+                                                placeholder={isEn ? 'Enter funding source or grant sponsor...' : 'Masukkan sumber pendanaan atau sponsor hibah...'}
                                                 className="w-full px-3.5 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#1AC13B]"
                                             />
                                         </div>

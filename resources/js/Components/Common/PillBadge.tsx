@@ -31,9 +31,6 @@ export const PillBadge: React.FC<PillBadgeProps> = ({
         <span
             className={`inline-flex items-center rounded-full font-bold tracking-wider uppercase transition-colors select-none ${variantStyles[variant]} ${sizeStyles[size]} ${className}`}
         >
-            {showDot && (
-                <span className="w-1.5 h-1.5 rounded-full bg-[#1AC13B] shrink-0 animate-pulse" />
-            )}
             {children}
         </span>
     );

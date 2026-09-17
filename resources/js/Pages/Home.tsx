@@ -165,7 +165,13 @@ export default function Home({
             </main>
 
             {/* Footer */}
-            <Footer siteConfig={siteConfig} t={t.footer} />
+            <Footer
+                siteConfig={siteConfig}
+                domains={domains}
+                publications={publications}
+                services={services}
+                t={t.footer}
+            />
 
             {/* Quick Search Modal */}
             <SearchModal

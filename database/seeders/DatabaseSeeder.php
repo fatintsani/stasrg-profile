@@ -15,8 +15,6 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->call(LandingPageSeeder::class);
-
         User::firstOrCreate(
             ['email' => 'admin@stasrg.telu.ac.id'],
             [

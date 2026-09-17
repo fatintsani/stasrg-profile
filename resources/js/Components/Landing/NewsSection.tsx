@@ -15,6 +15,7 @@ import {
     Newspaper,
 } from 'lucide-react';
 import { TranslationDictionary } from '../../utils/translations';
+import { EmptyState } from '../Common/EmptyState';
 
 interface NewsSectionProps {
     articles: Article[];
@@ -62,6 +63,8 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ articles, t }) => {
         return isEn ? (article.content || article.content_id) : (article.content_id || article.content);
     };
 
+    const activeArticles = (articles || []).filter((a) => a.is_active !== false);
+
     return (
         <section id="news" className="py-20 md:py-28 bg-white dark:bg-slate-950 border-b border-slate-100 dark:border-slate-900 transition-colors">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -72,95 +75,103 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ articles, t }) => {
                     align="between"
                     actionLink={{
                         text: t.viewAll,
-                        href: '#news',
+                        href: '/news',
                     }}
                 />
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7">
-                    {articles.map((article, index) => (
-                        <motion.div
-                            key={article.id || index}
-                            initial={{ opacity: 0, y: 15 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.4, delay: index * 0.08 }}
-                        >
-                            <Card
-                                padding="none"
-                                className="h-full flex flex-col justify-between group hover:border-[#1AC13B]/70 overflow-hidden cursor-pointer"
-                                onClick={() => setSelectedArticle(article)}
+                {activeArticles.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7">
+                        {activeArticles.map((article, index) => (
+                            <motion.div
+                                key={article.id || index}
+                                initial={{ opacity: 0, y: 15 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ duration: 0.4, delay: index * 0.08 }}
                             >
-                                <div>
-                                    {/* Cover Image */}
-                                    <div className="relative h-48 w-full overflow-hidden bg-slate-100 dark:bg-slate-900">
-                                        {article.image_url ? (
-                                            <img
-                                                src={article.image_url}
-                                                alt={getArticleTitle(article)}
-                                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                            />
-                                        ) : (
-                                            <div className="w-full h-full flex items-center justify-center text-slate-300 dark:text-slate-700">
-                                                <Newspaper className="w-12 h-12" />
+                                <Card
+                                    padding="none"
+                                    className="h-full flex flex-col justify-between group hover:border-[#1AC13B]/70 overflow-hidden cursor-pointer"
+                                    onClick={() => setSelectedArticle(article)}
+                                >
+                                    <div>
+                                        {/* Cover Image */}
+                                        <div className="relative h-48 w-full overflow-hidden bg-slate-100 dark:bg-slate-900">
+                                            {article.image_url ? (
+                                                <img
+                                                    src={article.image_url}
+                                                    alt={getArticleTitle(article)}
+                                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                                />
+                                            ) : (
+                                                <div className="w-full h-full flex items-center justify-center text-slate-300 dark:text-slate-700">
+                                                    <Newspaper className="w-12 h-12" />
+                                                </div>
+                                            )}
+                                            {/* Tag badge overlay */}
+                                            <div className="absolute top-3 left-3">
+                                                <span className="px-2.5 py-1 rounded-lg bg-white/95 dark:bg-slate-900/95 backdrop-blur-xs text-[#107E27] dark:text-[#3FD27B] font-extrabold text-[10px] tracking-wider uppercase border border-[#B2EFC3]/80 dark:border-[#1A5C2F] shadow-xs">
+                                                    {article.tag}
+                                                </span>
                                             </div>
-                                        )}
-                                        {/* Tag badge overlay */}
-                                        <div className="absolute top-3 left-3">
-                                            <span className="px-2.5 py-1 rounded-lg bg-white/95 dark:bg-slate-900/95 backdrop-blur-xs text-[#107E27] dark:text-[#3FD27B] font-extrabold text-[10px] tracking-wider uppercase border border-[#B2EFC3]/80 dark:border-[#1A5C2F] shadow-xs">
-                                                {article.tag}
-                                            </span>
-                                        </div>
-                                        {/* Featured badge overlay */}
-                                        {article.is_featured && (
-                                            <div className="absolute top-3 right-3 px-2 py-0.5 rounded-md bg-amber-500/95 backdrop-blur-xs text-white text-[10px] font-black flex items-center gap-1 shadow-xs">
-                                                <Sparkles className="w-3 h-3" />
-                                                <span>FEATURED</span>
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    {/* Card Body */}
-                                    <div className="p-5 space-y-3">
-                                        {/* Meta line */}
-                                        <div className="flex items-center justify-between gap-2 text-xs text-slate-400 dark:text-slate-500">
-                                            <span className="font-semibold text-slate-600 dark:text-slate-400 flex items-center gap-1.5 text-[11px]">
-                                                <Calendar className="w-3.5 h-3.5 text-[#1AC13B]" />
-                                                {article.date}
-                                            </span>
-                                            <span className="flex items-center gap-1 text-[11px]">
-                                                <Clock className="w-3 h-3" />
-                                                {article.read_time}
-                                            </span>
+                                            {/* Featured badge overlay */}
+                                            {article.is_featured && (
+                                                <div className="absolute top-3 right-3 px-2 py-0.5 rounded-md bg-amber-500/95 backdrop-blur-xs text-white text-[10px] font-black flex items-center gap-1 shadow-xs">
+                                                    <Sparkles className="w-3 h-3" />
+                                                    <span>FEATURED</span>
+                                                </div>
+                                            )}
                                         </div>
 
-                                        <h3 className="text-base font-bold text-slate-900 dark:text-white group-hover:text-[#107E27] dark:group-hover:text-[#1AC13B] transition-colors line-clamp-2 leading-snug">
-                                            {getArticleTitle(article)}
-                                        </h3>
+                                        {/* Card Body */}
+                                        <div className="p-5 space-y-3">
+                                            {/* Meta line */}
+                                            <div className="flex items-center justify-between gap-2 text-xs text-slate-400 dark:text-slate-500">
+                                                <span className="font-semibold text-slate-600 dark:text-slate-400 flex items-center gap-1.5 text-[11px]">
+                                                    <Calendar className="w-3.5 h-3.5 text-[#1AC13B]" />
+                                                    {article.date}
+                                                </span>
+                                                <span className="flex items-center gap-1 text-[11px]">
+                                                    <Clock className="w-3 h-3" />
+                                                    {article.read_time}
+                                                </span>
+                                            </div>
 
-                                        <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 line-clamp-3 leading-relaxed">
-                                            {getArticleSummary(article)}
-                                        </p>
+                                            <h3 className="text-base font-bold text-slate-900 dark:text-white group-hover:text-[#107E27] dark:group-hover:text-[#1AC13B] transition-colors line-clamp-2 leading-snug">
+                                                {getArticleTitle(article)}
+                                            </h3>
+
+                                            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 line-clamp-3 leading-relaxed">
+                                                {getArticleSummary(article)}
+                                            </p>
+                                        </div>
                                     </div>
-                                </div>
 
-                                <div className="p-5 pt-0 mt-auto">
-                                    <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
-                                        <span className="font-bold text-[#107E27] dark:text-[#1AC13B] group-hover:text-[#12A02E] inline-flex items-center gap-1.5 transition-colors">
-                                            {t.readMore}
-                                            <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
-                                        </span>
-                                        {article.author && (
-                                            <span className="text-[11px] text-slate-400 dark:text-slate-500 truncate max-w-[140px]">
-                                                {article.author}
+                                    <div className="p-5 pt-0 mt-auto">
+                                        <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
+                                            <span className="font-bold text-[#107E27] dark:text-[#1AC13B] group-hover:text-[#12A02E] inline-flex items-center gap-1.5 transition-colors">
+                                                {t.readMore}
+                                                <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
                                             </span>
-                                        )}
+                                            {article.author && (
+                                                <span className="text-[11px] text-slate-400 dark:text-slate-500 truncate max-w-[140px]">
+                                                    {article.author}
+                                                </span>
+                                            )}
+                                        </div>
                                     </div>
-                                </div>
-                            </Card>
-                        </motion.div>
-                    ))}
-                </div>
+                                </Card>
+                            </motion.div>
+                        ))}
+                    </div>
+                ) : (
+                    <EmptyState
+                        title={isEn ? 'No news & articles found' : 'Tidak ada data berita & wawasan ditemukan'}
+                        description={isEn ? 'Articles and research insights are not available in the database.' : 'Publikasi artikel dan rilis berita belum tersedia di database.'}
+                    />
+                )}
             </div>
+
 
             {/* Article Detail Modal */}
             <AnimatePresence>
